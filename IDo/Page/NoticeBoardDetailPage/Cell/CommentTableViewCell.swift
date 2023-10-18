@@ -10,15 +10,23 @@ import SnapKit
 
 class CommentTableViewCell: UITableViewCell, Reusable {
     
+//    let userInfoStackView: HorizentalImageTitleView = HorizentalImageTitleView()
     let userInfoStackView: WriterStackView = WriterStackView()
-    var contentLabel: UILabel = {
+    let contentLabel: UILabel = {
         let label = UILabel()
         label.font = .bodyFont(.small, weight: .regular)
         label.text = "텍스트 입니다"
         label.numberOfLines = 1
         return label
     }()
-    var moreButtonTapHandler: () -> Void = {}
+//    let dateLabel: UILabel = {
+//        let label = UILabel()
+//        label.font = .bodyFont(.small, weight: .regular)
+//        let date = Date().addingTimeInterval(-300)
+//        label.text = date.diffrenceDate
+//        label.numberOfLines = 1
+//        return label
+//    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -28,23 +36,24 @@ class CommentTableViewCell: UITableViewCell, Reusable {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
+    
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
 
-extension CommentTableViewCell {
-    func setDate(dateText: String) {
-        userInfoStackView.writerTimeLabel.text = dateText
+        // Configure the view for the selected state
     }
+
 }
 
 private extension CommentTableViewCell {
     func setup() {
         addViews()
         autoLayoutSetup()
-        writeStackViewSetup()
     }
     func addViews() {
         contentView.addSubview(userInfoStackView)
         contentView.addSubview(contentLabel)
+//        contentView.addSubview(dateLabel)
     }
     func autoLayoutSetup() {
         userInfoStackView.snp.makeConstraints { make in
@@ -55,12 +64,6 @@ private extension CommentTableViewCell {
             make.top.equalTo(userInfoStackView.snp.bottom).offset(Constant.margin2)
             make.left.right.equalTo(contentView)
             make.bottom.equalTo(contentView).inset(Constant.margin2)
-        }
-    }
-    func writeStackViewSetup() {
-        userInfoStackView.moreButtonTapHandler = { [weak self] in
-            guard let self else { return }
-            self.moreButtonTapHandler()
         }
     }
 }

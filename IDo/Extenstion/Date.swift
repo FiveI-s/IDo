@@ -29,7 +29,22 @@ extension Date {
         } else if let minute = diffrenceDate.minute,
                   !(minute <= 0) {
             return "\(minute)분 전"
+        }  else if diffrenceDate.minute == 0 {
+            return "방금전"
         }
         return nil
+    }
+    var dateToString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter.string(from: self)
+    }
+}
+
+extension String {
+    var toDate: Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter.date(from: self)
     }
 }

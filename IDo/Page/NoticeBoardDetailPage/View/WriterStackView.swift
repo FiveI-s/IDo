@@ -9,10 +9,22 @@ import UIKit
 
 final class WriterStackView: UIStackView {
     
+    private let horizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        return stackView
+    }()
     private let writerImageView: BasicImageView = {
         let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
         imageView.backgroundColor = UIColor(color: .contentPrimary)
         imageView.contentMargin = 4
+        return imageView
+    }()
+    private let moreImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "ellipsis"))
+        imageView.tintColor = UIColor(color: .backgroundTertiary)
         return imageView
     }()
     private let verticalStackView: UIStackView = {
@@ -22,7 +34,7 @@ final class WriterStackView: UIStackView {
         stackView.distribution = .equalSpacing
         return stackView
     }()
-    private let writerNameLabel: UILabel = {
+    let writerNameLabel: UILabel = {
         let label = UILabel()
         label.font = .bodyFont(.medium, weight: .regular)
         label.textColor = UIColor(color: .textStrong)
@@ -30,7 +42,7 @@ final class WriterStackView: UIStackView {
         label.text = "사용자 이름"
         return label
     }()
-    private let writerTimeLabel: UILabel = {
+    let writerTimeLabel: UILabel = {
         let label = UILabel()
         label.font = .bodyFont(.xSmall, weight: .regular)
         label.textColor = UIColor(color: .text1)
@@ -39,6 +51,7 @@ final class WriterStackView: UIStackView {
         label.text = date.diffrenceDate
         return label
     }()
+    var moreButtonTapHandler: () -> Void = {}
     
 
     override init(frame: CGRect) {
@@ -61,6 +74,7 @@ private extension WriterStackView {
         stackViewSetup()
         addViews()
         autoLayoutSetup()
+        imageViewSetup()
     }
     
     func stackViewSetup() {
@@ -73,7 +87,9 @@ private extension WriterStackView {
     func addViews() {
         addArrangedSubview(writerImageView)
         addArrangedSubview(verticalStackView)
-        verticalStackView.addArrangedSubview(writerNameLabel)
+        horizontalStackView.addArrangedSubview(writerNameLabel)
+        horizontalStackView.addArrangedSubview(moreImageView)
+        verticalStackView.addArrangedSubview(horizontalStackView)
         verticalStackView.addArrangedSubview(writerTimeLabel)
     }
     
@@ -81,5 +97,15 @@ private extension WriterStackView {
         writerImageView.snp.makeConstraints { make in
             make.width.height.equalTo(30)
         }
+    }
+    
+    func imageViewSetup() {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(moreButtonTap))
+        moreImageView.isUserInteractionEnabled = true
+        moreImageView.addGestureRecognizer(gesture)
+    }
+    
+    @objc func moreButtonTap() {
+        moreButtonTapHandler()
     }
 }

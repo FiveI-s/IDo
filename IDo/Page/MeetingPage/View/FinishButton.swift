@@ -8,7 +8,7 @@ class FinishButton: UIButton {
         
         self.setTitle(title, for: .normal)
         self.titleLabel?.font = UIFont(name: "Inter", size: 20) ?? UIFont.systemFont(ofSize: 20, weight: .medium)
-        self.backgroundColor = UIColor(named: "Sub")
+        self.backgroundColor = UIColor(named: "ContentPrimay")
         self.setTitleColor(.white, for: .normal)
         self.layer.cornerRadius = 20
         self.clipsToBounds = true
@@ -21,5 +21,11 @@ class FinishButton: UIButton {
     
     @objc private func showDebug() {
         print("버튼누름")
+    }
+    
+    override var isEnabled: Bool {
+        didSet {
+            backgroundColor = isEnabled ? UIColor(named: "ContentPrimay") : .lightGray
+        }
     }
 }

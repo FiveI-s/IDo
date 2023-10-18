@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "MeetingProfileImage.png",
+      "filename" : "ImageSelectorView.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "MeetingProfileImage@2x.png",
+      "filename" : "ImageSelectorView@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "MeetingProfileImage@3x.png",
+      "filename" : "ImageSelectorView@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

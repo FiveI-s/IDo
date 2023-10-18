@@ -8,7 +8,7 @@
 import UIKit
 
 class CategoryViewController: UITableViewController {
-    let categoryData = ["IT/개발", "사진/영상", "음악/악기", "게임/오락", "여행/맛집", "댄스/공연", "동물/식물", "낚시/캠핑", "운동/스포츠"]
+    let categoryData = ["IT•개발", "사진•영상", "음악•악기", "게임•오락", "여행•맛집", "댄스•공연", "동물•식물", "낚시•캠핑", "운동•스포츠"]
     let categoryImage = UIImage(systemName: "pencil.circle")
 
     override func viewDidLoad() {
@@ -40,6 +40,7 @@ class CategoryViewController: UITableViewController {
 
             let exampleVC = MeetingViewController()
             exampleVC.categoryData = selectedCategory
+            
 
             navigationController?.pushViewController(exampleVC, animated: true)
         default:

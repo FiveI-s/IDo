@@ -13,4 +13,5 @@ struct Constant {
     static let margin1: CGFloat = 4
     static let margin2: CGFloat = 8
     static let margin3: CGFloat = 16
+    static let margin4: CGFloat = 20
 }

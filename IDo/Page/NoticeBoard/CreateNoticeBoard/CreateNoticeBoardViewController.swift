@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol RemoveDelegate: AnyObject {
+    func removeCell(_ indexPath: IndexPath)
+}
+
 class CreateNoticeBoardViewController: UIViewController {
+    
+    var count = 10
     
     private let createNoticeBoardView = CreateNoticeBoardView()
     
@@ -24,7 +30,7 @@ class CreateNoticeBoardViewController: UIViewController {
     override func loadView() {
         view = createNoticeBoardView
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -49,7 +55,24 @@ class CreateNoticeBoardViewController: UIViewController {
     
 }
 
-// MARK: - Navigation 관련 extension
+// MARK: - Alert 관련 extension
+private extension CreateNoticeBoardViewController {
+    func popAlert() {
+        if createNoticeBoardView.titleTextView.textColor == UIColor(color: .placeholder), createNoticeBoardView.contentTextView.textColor != UIColor(color: .placeholder) {
+            AlertManager.showAlert(on: self, title: "알림", message: "제목을 입력해주세요.")
+        }
+        
+        else if createNoticeBoardView.titleTextView.textColor != UIColor(color: .placeholder), createNoticeBoardView.contentTextView.textColor == UIColor(color: .placeholder) {
+            AlertManager.showAlert(on: self, title: "알림", message: "내용을 입력해주세요.")
+        }
+        
+        else if createNoticeBoardView.titleTextView.textColor == UIColor(color: .placeholder) && createNoticeBoardView.contentTextView.textColor == UIColor(color: .placeholder) {
+            AlertManager.showAlert(on: self, title: "알림", message: "제목과 내용을 입력해주세요.")
+        }
+    }
+}
+
+// MARK: - NavigationBar 관련 extension
 private extension CreateNoticeBoardViewController {
     
     func navigationControllerSet() {
@@ -81,21 +104,18 @@ private extension CreateNoticeBoardViewController {
         
         // 처음 작성 할 때
         else {
-            DispatchQueue.main.async {
-                
-                // 제목 textView
-                self.createNoticeBoardView.titleTextView.text = "제목을 입력하세요."
-                self.createNoticeBoardView.titleTextView.textColor = UIColor(color: .placeholder)
-                self.createNoticeBoardView.titleTextView.resignFirstResponder()
-                
-                // 내용 textView
-                self.createNoticeBoardView.contentTextView.text = "내용을 입력하세요."
-                self.createNoticeBoardView.contentTextView.textColor = UIColor(color: .placeholder)
-                self.createNoticeBoardView.contentTextView.resignFirstResponder()
-            }
+            // 제목 textView
+            self.createNoticeBoardView.titleTextView.text = "제목을 입력하세요."
+            self.createNoticeBoardView.titleTextView.textColor = UIColor(color: .placeholder)
+            self.createNoticeBoardView.titleTextView.resignFirstResponder()
+            
+            // 내용 textView
+            self.createNoticeBoardView.contentTextView.text = "내용을 입력하세요."
+            self.createNoticeBoardView.contentTextView.textColor = UIColor(color: .placeholder)
+            self.createNoticeBoardView.contentTextView.resignFirstResponder()
             
             // 네비게이션 바 오른쪽 버튼 커스텀 -> 완료
-            let finishButton = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(finishButtonTappedEdit))
+            let finishButton = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(finishButtonTappedNew))
             self.navigationItem.rightBarButtonItem = finishButton
             self.navigationItem.rightBarButtonItem?.tintColor = UIColor(color: .main)
         }
@@ -103,30 +123,123 @@ private extension CreateNoticeBoardViewController {
     
     // 새로운 메모 작성
     @objc func finishButtonTappedNew() {
-        navigationController?.popViewController(animated: true)
+        
         if isTitleTextViewEdited && isContentTextViewEdited {
             let newTitleText = createNoticeBoardView.titleTextView.text
             let newContentText = createNoticeBoardView.contentTextView.text
             
             // 메모 추가 코드 필요
+            
+            // 제목과 내용이 채워졌을 때
+            if createNoticeBoardView.titleTextView.textColor != UIColor(color: .placeholder), createNoticeBoardView.contentTextView.textColor != UIColor(color: .placeholder) {
+                
+                navigationController?.popViewController(animated: true)
+            }
+            
+            // 제목과 내용이 채워지지 않았을 때
+            else {
+                popAlert()
+            }
         }
     }
     
     // 메모 내용 수정
     @objc func finishButtonTappedEdit() {
-        navigationController?.popViewController(animated: true)
         
-        if let updatedTitle = createNoticeBoardView.titleTextView.text, !updatedTitle.isEmpty, let updatedContent = createNoticeBoardView.contentTextView.text, !updatedContent.isEmpty,
-           let index = editingMemoIndex {
+        if !createNoticeBoardView.titleTextView.text.isEmpty, !createNoticeBoardView.contentTextView.text.isEmpty, let index = editingMemoIndex {
             
             // 해당 인덱스의 메모 수정 코드 필요
             
             // 수정된 메모 내용을 업데이트하고 해당 셀만 리로드
             (self.navigationController?.viewControllers.first as? NoticeBoardView)?.noticeBoardTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            
+            // 제목과 내용이 채워졌을 때
+            if createNoticeBoardView.titleTextView.textColor != UIColor(color: .placeholder), createNoticeBoardView.contentTextView.textColor != UIColor(color: .placeholder) {
+                
+                navigationController?.popViewController(animated: true)
+            }
+            
+            // 제목과 내용이 채워지지 않았을 때
+            else {
+                popAlert()
+            }
         }
         
         // 수정 모드 종료
         isEditingMode = false
+    }
+}
+
+// MARK: - TextView 관련
+extension CreateNoticeBoardViewController: UITextViewDelegate {
+    
+    // 초기 호출
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        
+        // 제목 textView
+        if textView == createNoticeBoardView.titleTextView {
+            if createNoticeBoardView.titleTextView.textColor == UIColor(color: .placeholder) {
+                
+                createNoticeBoardView.titleTextView.text = nil
+                createNoticeBoardView.titleTextView.textColor = UIColor.black
+            }
+        }
+        
+        // 내용 textView
+        else if textView == createNoticeBoardView.contentTextView {
+            if createNoticeBoardView.contentTextView.textColor == UIColor(color: .placeholder) {
+                
+                createNoticeBoardView.contentTextView.text = nil
+                createNoticeBoardView.contentTextView.textColor = UIColor.black
+            }
+        }
+        print(isTitleTextViewEdited)
+        print(isContentTextViewEdited)
+    }
+    
+    // 입력 시 호출
+    func textViewDidChange(_ textView: UITextView) {
+        if !createNoticeBoardView.titleTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && createNoticeBoardView.titleTextView.textColor == UIColor.black {
+            isTitleTextViewEdited = true
+        }
+        
+        else if !createNoticeBoardView.contentTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && createNoticeBoardView.contentTextView.textColor == UIColor.black{
+            isContentTextViewEdited = true
+        }
+        //isTitleTextViewEdited = !textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        //isContentTextViewEdited = !textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    // 입력 종료 시 호출
+    func textViewDidEndEditing(_ textView: UITextView) {
+        
+        if createNoticeBoardView.titleTextView.text.isEmpty {
+            createNoticeBoardView.titleTextView.text =  "제목을 입력하세요."
+            createNoticeBoardView.titleTextView.textColor = UIColor(color: .placeholder)
+        }
+        
+        else if createNoticeBoardView.contentTextView.text.isEmpty {
+            createNoticeBoardView.contentTextView.text =  "내용을 입력하세요."
+            createNoticeBoardView.contentTextView.textColor = UIColor(color: .placeholder)
+        }
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        let currentText = textView.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        
+        let chagedText = currentText.replacingCharacters(in: stringRange, with: text)
+        
+        if textView == createNoticeBoardView.titleTextView {
+            createNoticeBoardView.titleCountLabel.text = "(\(chagedText.count)/15)"
+            return chagedText.count <= 15
+        }
+        
+        else if textView == createNoticeBoardView.contentTextView {
+            createNoticeBoardView.contentCountLabel.text = "(\(chagedText.count)/500)"
+            return chagedText.count <= 499
+        }
+        return true
     }
 }
 
@@ -149,59 +262,23 @@ extension CreateNoticeBoardViewController: UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[.originalImage] as? UIImage {
             if let cell = createNoticeBoardView.galleryCollectionView.visibleCells.first as? GalleryCollectionViewCell {
-                    cell.galleryImageView.image = image
-                }
+                cell.createNoticeBoardImagePicker.galleryImageView.image = image
+            }
         }
         picker.dismiss(animated: true, completion: nil)
-    }
-}
-
-// MARK: - TextView 관련
-extension CreateNoticeBoardViewController: UITextViewDelegate {
-    
-    // 초기 호출
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if createNoticeBoardView.titleTextView.textColor == UIColor(color: .placeholder), createNoticeBoardView.contentTextView.textColor == UIColor(color: .placeholder) {
-            
-            // 제목 textView
-            createNoticeBoardView.titleTextView.text = nil
-            createNoticeBoardView.titleTextView.textColor = UIColor.black
-            
-            // 내용 textView
-            createNoticeBoardView.contentTextView.text = nil
-            createNoticeBoardView.contentTextView.textColor = UIColor.black
-        }
-    }
-    
-    // 입력 시 호출
-    func textViewDidChange(_ textView: UITextView) {
-        isTitleTextViewEdited = !textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        isContentTextViewEdited = !textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-    
-    // 입력 종료 시 호출
-    func textViewDidEndEditing(_ textView: UITextView) {
-        
-        if createNoticeBoardView.titleTextView.text.isEmpty {
-            createNoticeBoardView.titleTextView.text =  "제목을 입력하세요."
-            createNoticeBoardView.titleTextView.textColor = UIColor(color: .placeholder)
-        }
-        
-        else if createNoticeBoardView.contentTextView.text.isEmpty {
-            createNoticeBoardView.contentTextView.text =  "내용을 입력하세요."
-            createNoticeBoardView.contentTextView.textColor = UIColor(color: .placeholder)
-        }
     }
 }
 
 // MARK: - 사진 CollectionView 관련
 extension CreateNoticeBoardViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+        return count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GalleryCollectionViewCell.identifier, for: indexPath) as? GalleryCollectionViewCell else { return UICollectionViewCell() }
+        cell.indexPath = indexPath
+        cell.removeCellDelegate = self
         return cell
     }
     
@@ -212,7 +289,7 @@ extension CreateNoticeBoardViewController: UICollectionViewDelegateFlowLayout {
     
     // CollectionView Cell의 사이즈
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (collectionView.bounds.width - 4)/3, height: (collectionView.bounds.width - 4)/3)
+        return CGSize(width: (collectionView.bounds.width - 8)/5, height: (collectionView.bounds.width - 8)/5)
     }
     
     // 수평
@@ -233,4 +310,13 @@ extension CreateNoticeBoardViewController: UINavigationControllerDelegate {
     }
 }
 
-
+extension CreateNoticeBoardViewController: RemoveDelegate {
+    func removeCell(_ indexPath: IndexPath) {
+        createNoticeBoardView.galleryCollectionView.performBatchUpdates {
+            self.count -= 1
+            self.createNoticeBoardView.galleryCollectionView.deleteItems(at: [indexPath])
+        } completion: { (_) in
+            self.createNoticeBoardView.galleryCollectionView.reloadData()
+        }
+    }
+}

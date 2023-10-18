@@ -49,7 +49,7 @@ private extension NoticeBoardView {
     // 오토레이아웃 설정
     func autoLayout() {
         noticeBoardTableView.snp.makeConstraints { make in
-            make.top.equalTo(snp.top)
+            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(30)
             make.leading.equalTo(snp.leading)
             make.trailing.equalTo(snp.trailing)
             make.bottom.equalTo(snp.bottom)

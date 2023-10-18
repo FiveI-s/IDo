@@ -22,7 +22,6 @@ class BasicCell: UITableViewCell {
 
     let basicImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.tintColor = .black
         return imageView
     }()
 

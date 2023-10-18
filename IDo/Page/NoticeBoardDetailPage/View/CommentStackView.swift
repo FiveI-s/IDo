@@ -94,7 +94,7 @@ extension CommentStackView {
     @objc private func sendButtonClick() {
         guard let textComment = commentTextView.text else { return }
         commentAddHandler?(textComment)
-        textviewEmptySetup()
+        commentTextView.text = ""
         commentTextView.constraints.forEach { (constraint) in
             if constraint.firstAttribute == .height {
                 constraint.constant = imageSize
@@ -119,12 +119,6 @@ extension CommentStackView {
         sendButton.snp.makeConstraints { make in
             make.width.height.equalTo(imageSize)
         }
-    }
-    
-    private func textviewEmptySetup() {
-        commentTextView.text = textViewPlaceHolder
-        commentTextView.textColor = UIColor(color: .placeholder)
-        commentTextView.resignFirstResponder()
     }
     
     override func layoutSubviews() {
@@ -154,16 +148,16 @@ extension CommentStackView: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.text == textViewPlaceHolder {
             textView.text = nil
-            textView.textColor = UIColor(color: .textStrong)
+            textView.textColor = .black
         }
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            textviewEmptySetup()
+            textView.text = textViewPlaceHolder
+            textView.textColor = .systemGray4
         }
     }
-    
 }
 
 extension UITextView {

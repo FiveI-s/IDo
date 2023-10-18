@@ -22,7 +22,7 @@ class CreateNoticeBoardView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // 제목을 작성하는 textView
+    // TitleTextView 생성
     private(set) lazy var titleTextView: UITextView = {
         var textView = UITextView()
         textView.backgroundColor = UIColor(color: .backgroundSecondary)
@@ -31,16 +31,7 @@ class CreateNoticeBoardView: UIView {
         return textView
     }()
     
-    // Title Text 글자 수 표시 label
-    private(set) lazy var titleCountLabel: UILabel = {
-        var label = UILabel()
-        label.text = "(0/15)"
-        label.textColor = UIColor(color: .placeholder)
-        label.font = UIFont.bodyFont(.small, weight: .medium)
-        return label
-    }()
-    
-    // 내용을 작성하는 textView
+    // ContentTextView 생성
     private(set) lazy var contentTextView: UITextView = {
         var textView = UITextView()
         textView.backgroundColor = UIColor(color: .backgroundSecondary)
@@ -49,17 +40,7 @@ class CreateNoticeBoardView: UIView {
         return textView
     }()
     
-    // Content Text 글자 수 표시 label
-    private(set) lazy var contentCountLabel: UILabel = {
-        var label = UILabel()
-        label.text = "(0/500)"
-        label.textColor = UIColor(color: .placeholder)
-        label.font = UIFont.bodyFont(.small, weight: .medium)
-        return label
-    }()
-    
-    
-    // 사진을 추가하는 button
+    // 사진 생성 버튼
     private(set) lazy var addPictureButton: UIButton = {
         let button = UIButton()
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .light)
@@ -72,13 +53,12 @@ class CreateNoticeBoardView: UIView {
         return button
     }()
     
-    // 추가 사진을 보여주는 collectionView
+    // 사진 생성
     private(set) lazy var galleryCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(GalleryCollectionViewCell.self, forCellWithReuseIdentifier: GalleryCollectionViewCell.identifier)
-        collectionView.isScrollEnabled = false
         return collectionView
     }()
 }
@@ -91,9 +71,7 @@ private extension CreateNoticeBoardView {
     
     func addSubView() {
         addSubview(titleTextView)
-        addSubview(titleCountLabel)
         addSubview(contentTextView)
-        addSubview(contentCountLabel)
         addSubview(addPictureButton)
         addSubview(galleryCollectionView)
     }
@@ -106,25 +84,15 @@ private extension CreateNoticeBoardView {
             make.height.equalTo(40)
         }
         
-        titleCountLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleTextView.snp.bottom).offset(Constant.margin1)
-            make.trailing.equalTo(snp.trailing).offset(-Constant.margin3)
-        }
-        
         contentTextView.snp.makeConstraints { make in
-            make.top.equalTo(titleCountLabel.snp.bottom).offset(Constant.margin3)
+            make.top.equalTo(titleTextView.snp.bottom).offset(Constant.margin3)
             make.leading.equalTo(snp.leading).offset(Constant.margin3)
             make.trailing.equalTo(snp.trailing).offset(-Constant.margin3)
-            make.height.equalTo(320)
-        }
-        
-        contentCountLabel.snp.makeConstraints { make in
-            make.top.equalTo(contentTextView.snp.bottom).offset(Constant.margin1)
-            make.trailing.equalTo(snp.trailing).offset(-Constant.margin3)
+            make.height.equalTo(240)
         }
         
         addPictureButton.snp.makeConstraints { make in
-            make.top.equalTo(contentCountLabel.snp.bottom).offset(Constant.margin3)
+            make.top.equalTo(contentTextView.snp.bottom).offset(Constant.margin3)
             make.leading.equalTo(snp.leading).offset(Constant.margin3)
             make.trailing.equalTo(snp.trailing).offset(-Constant.margin3)
             make.height.equalTo(30)

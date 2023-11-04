@@ -128,7 +128,8 @@ class MyProfileViewController: UIViewController {
         deleteID.addTarget(self, action: #selector(deleteIDButtonTapped), for: .touchUpInside)
     }
 
-    func updateButtonTitle() {
+    /// TextField 업데이트
+    func updateTextFieldText() {
         let hobbiesString = hobbyList.joined(separator: ", ")
         choiceEnjoyTextField.text = hobbiesString
     }
@@ -137,7 +138,7 @@ class MyProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         makeChoiceEnjoyTextField()
-        updateButtonTitle()
+        updateTextFieldText()
         makeProfileImage()
         makeProfileName()
         makeSelfInfo()
@@ -166,7 +167,7 @@ class MyProfileViewController: UIViewController {
     // 로드가 된 뒤에 보여지는 뷰
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateButtonTitle()
+        updateTextFieldText()
         profileName.resignFirstResponder()
         selfInfoDetail.resignFirstResponder()
     }
@@ -512,6 +513,7 @@ extension MyProfileViewController: UIPickerViewDelegate, UIPickerViewDataSource 
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let selectedHobby = enjoyList[row]
         choiceEnjoyTextField.text = selectedHobby
+        MyProfile.shared.update(hobbyList: [selectedHobby])
     }
 }
 

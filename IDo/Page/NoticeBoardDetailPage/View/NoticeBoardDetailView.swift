@@ -13,7 +13,7 @@ final class NoticeBoardDetailView: UIStackView {
     let writerInfoView: WriterStackView = WriterStackView()
     let contentTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .bodyFont(.medium, weight: .bold)
+        label.font = .bodyFont(.large, weight: .bold)
         label.text = "제목 입니다."
         label.numberOfLines = 0
         label.textColor = UIColor(color: .textStrong)

@@ -41,8 +41,8 @@ final class MyProfile {
                 if let profilePath = idoUser.profileImagePath {
                     self.loadImage(defaultPath: profilePath, paths: ImageSize.allCases)
                     completion?(true)
+                    return
                 }
-                return
             case .failure(let error):
                 completion?(false)
                 print(error.localizedDescription)
@@ -50,7 +50,7 @@ final class MyProfile {
         }
     }
     
-    private func loadImage(defaultPath: String, paths: [ImageSize]) {
+    func loadImage(defaultPath: String, paths: [ImageSize], completion: (() -> Void)? = nil) {
         let defaultStorageRef = Storage.storage().reference().child(defaultPath)
         paths.forEach { path in
             let storageRefPath = defaultStorageRef.child(path.rawValue).fullPath
@@ -60,8 +60,10 @@ final class MyProfile {
                     self.myUserInfo?.profileImage[path.rawValue] = image.pngData()
                     guard let myUserInfo = self.myUserInfo else { return }
                     self.fileCache.storeFile(myUserInfo: myUserInfo)
+                    completion?()
                 case .failure(let error):
                     print(error.localizedDescription)
+                    completion?()
                 }
             }
         }

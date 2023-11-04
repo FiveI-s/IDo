@@ -38,7 +38,7 @@ final class WriterStackView: UIStackView {
     }()
     let writerNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .bodyFont(.medium, weight: .regular)
+        label.font = .bodyFont(.small, weight: .medium)
         label.textColor = UIColor(color: .textStrong)
         label.numberOfLines = 1
         label.text = "사용자 이름"
@@ -83,7 +83,7 @@ private extension WriterStackView {
         axis = .horizontal
         alignment = .center
         distribution = .fill
-        spacing = 4
+        spacing = 8
     }
     
     func addViews() {

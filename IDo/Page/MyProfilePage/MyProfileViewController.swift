@@ -45,14 +45,14 @@ class MyProfileViewController: UIViewController {
     var isEdit = false
         
     func makeProfileImage() {
-        profileImage.setImage(UIImage(named: "profile"), for: .normal)
         profileImage.imageView?.contentMode = .scaleAspectFill
         profileImage.layer.cornerRadius = 50
         profileImage.clipsToBounds = true
+        profileImage.isUserInteractionEnabled = false
     }
         
     func makeProfileName() {
-        profileName.text = "애라링"
+        profileName.text = ""
         profileName.textAlignment = .center
         profileName.textColor = .black
         profileName.font = UIFont.headFont(.xSmall, weight: .medium)
@@ -80,8 +80,8 @@ class MyProfileViewController: UIViewController {
     }
         
     func makeSelfInfoDetail() {
-        selfInfoDetail.font = UIFont.bodyFont(.medium, weight: .regular)
         selfInfoDetail.text = ""
+        selfInfoDetail.font = UIFont.bodyFont(.medium, weight: .regular)
         selfInfoDetail.textColor = UIColor(named: "ui-text-strong")
         selfInfoDetail.backgroundColor = UIColor(color: .backgroundSecondary)
         selfInfoDetail.layer.cornerRadius = 10
@@ -170,6 +170,30 @@ class MyProfileViewController: UIViewController {
         updateTextFieldText()
         profileName.resignFirstResponder()
         selfInfoDetail.resignFirstResponder()
+        getProfile()
+    }
+    
+    private func getProfile() {
+        guard let myProfile = MyProfile.shared.myUserInfo else { return }
+        profileName.text = myProfile.nickName
+        if let hobby = myProfile.hobbyList?.first {
+            choiceEnjoyTextField.text = hobby
+        }
+        if let description = myProfile.description {
+            selfInfoDetail.text = description
+        }
+        if let profileMediumImageData = myProfile.profileImage[ImageSize.medium.rawValue],
+           let profileMediumImage = UIImage(data: profileMediumImageData) {
+            profileImage.setImage(profileMediumImage, for: .normal)
+        }
+        guard let imagePath = myProfile.profileImagePath else { return }
+        MyProfile.shared.loadImage(defaultPath: imagePath, paths: [.medium]) {
+            guard let imageData = MyProfile.shared.myUserInfo?.profileImage[ImageSize.medium.rawValue],
+                  let image = UIImage(data: imageData) else { return }
+            DispatchQueue.main.async {
+                self.profileImage.setImage(image, for: .normal)
+            }
+        }
     }
         
     func setLayout() {
@@ -358,6 +382,7 @@ private extension MyProfileViewController {
             logout.isHidden = true
             line.isHidden = true
             deleteID.isHidden = true
+            profileImage.isUserInteractionEnabled = true
             choiceEnjoyTextField.tintColor = .clear
 
             // isEdit = false인 상태의 실행 코드
@@ -372,7 +397,14 @@ private extension MyProfileViewController {
             logout.isHidden = false
             line.isHidden = false
             deleteID.isHidden = false
+            profileImage.isUserInteractionEnabled = false
             choiceEnjoyTextField.tintColor = .clear
+            guard let hobby = choiceEnjoyTextField.text else {
+                print("관심사가 업습니다.")
+                return
+            }
+            //TODO: 프로필 업데이트이 수정이 되지 않은 경우 업데이트를 안하도록 수정이 필요함
+            MyProfile.shared.update(nickName: profileName.text, updateProfileImage: profileImage.image(for: .normal), description: selfInfoDetail.text, hobbyList: [hobby])
         }
     }
 }

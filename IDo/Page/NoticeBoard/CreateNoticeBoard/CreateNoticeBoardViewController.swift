@@ -294,7 +294,7 @@ extension CreateNoticeBoardViewController: UITextViewDelegate {
         }
         
         if textView == createNoticeBoardView.contentTextView {
-            if changedText.count > 16 {
+            if changedText.count > 500 {
                 createNoticeBoardView.contentCountLabel.textColor = UIColor.red
                 shakeAnimation(for: createNoticeBoardView.contentCountLabel)
                 return false
@@ -390,32 +390,61 @@ extension CreateNoticeBoardViewController: UINavigationControllerDelegate {
 
 // MARK: - 사진 삭제 관련
 extension CreateNoticeBoardViewController: RemoveDelegate {
-//    func removeCell(_ indexPath: IndexPath) {
-//        createNoticeBoardView.galleryCollectionView.performBatchUpdates {
-//            firebaseManager.selectedImage.remove(at: indexPath.row)
-//            createNoticeBoardView.galleryCollectionView.deleteItems(at: [indexPath])
-//        } completion: { (_) in
-//
-//            self.createNoticeBoardView.galleryCollectionView.reloadData()
-//        }
-//    }
-    func removeCell(_ indexPath: IndexPath) {
-        // 선택한 이미지의 Storage 경로를 가져옴
-        let imagePath = firebaseManager.noticeBoards[editingMemoIndex!].imageList![indexPath.row]
-        
-        // Firebase Storage에서 이미지를 삭제
-        firebaseManager.deleteImage(noticeBoardID: firebaseManager.noticeBoards[editingMemoIndex!].id, imagePaths: [imagePath]) { success in
-            if success {
-                // 로컬에서 이미지를 삭제하고 Collection View를 업데이트
-                self.createNoticeBoardView.galleryCollectionView.performBatchUpdates {
-                    self.firebaseManager.selectedImage[String(indexPath.row)] = nil
-                    self.createNoticeBoardView.galleryCollectionView.deleteItems(at: [indexPath])
-                } completion: { (_) in
-                    self.createNoticeBoardView.galleryCollectionView.reloadData()
-                }
-            } else {
-                print("Firebase Storage에서 이미지 삭제 실패")
+    
+    func removeLocal(_ indexPath: IndexPath) {
+        // 로컬에서 이미지를 삭제하고 Collection View를 업데이트
+        self.createNoticeBoardView.galleryCollectionView.performBatchUpdates {
+            
+            // 선택된 인덱스에 해당하는 이미지를 딕셔너리에서 삭제
+            self.firebaseManager.selectedImage[String(indexPath.row)] = nil
+            
+            // 해당하는 아이템을 CollectionView에서 삭제
+            self.createNoticeBoardView.galleryCollectionView.deleteItems(at: [indexPath])
+        } completion: { _ in
+            
+            // 딕셔너리의 키를 재정렬
+            let keys = self.firebaseManager.selectedImage.keys.compactMap { Int($0) }.sorted()
+            var newSelectedImage: [String: UIImage] = [:]
+            for (index, key) in keys.enumerated() where key > indexPath.row {
+                
+                // 키 값을 재정렬하기 전에 현재 이미지를 새로운 키로 이동
+                newSelectedImage[String(index)] = self.firebaseManager.selectedImage[String(key)]
             }
+            // 재정렬된 이미지 딕셔너리를 업데이트
+            self.firebaseManager.selectedImage = newSelectedImage
+            
+            // self.createNoticeBoardView.galleryCollectionView.reloadData()
+        }
+    }
+
+    func removeCell(_ indexPath: IndexPath) {
+        
+        // 게시글을 수정할 때
+        if isEditingMode {
+            
+            // storage에 이미지가 있을 때
+            if let editingMemoIndex = editingMemoIndex,
+               let imageList = firebaseManager.noticeBoards[editingMemoIndex].imageList,
+               indexPath.row < imageList.count {
+                
+                let imagePath = imageList[indexPath.row]
+                
+                // Firebase Storage에서 이미지를 삭제
+                firebaseManager.deleteImage(noticeBoardID: firebaseManager.noticeBoards[editingMemoIndex].id, imagePaths: [imagePath]) { success in
+                    self.removeLocal(indexPath)
+                    
+                }
+            }
+            
+            // storage에 이미지가 없을 때
+            else {
+                removeLocal(indexPath)
+            }
+        }
+        
+        // 처음 게시글을 작성할 때
+        else {
+            removeLocal(indexPath)
         }
     }
 }

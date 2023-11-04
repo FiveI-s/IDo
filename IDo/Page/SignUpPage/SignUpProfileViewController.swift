@@ -261,12 +261,20 @@ private extension SignUpProfileViewController {
     }
 
     func firebaseLogin() {
-        Auth.auth().signIn(withEmail: email, password: password) { _, error in
+        Auth.auth().signIn(withEmail: email, password: password) { authData, error in
             if let error {
                 print("Login Error: \(error.localizedDescription)")
                 return
             }
-            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(TabBarController(), animated: true)
+            guard let authData else { return }
+            let uid = authData.user.uid
+            MyProfile.shared.getUserProfile(uid: uid) { isSuccess in
+                guard isSuccess else {
+                    print("사용자 정보를 가져오지 못했습니다.")
+                    return
+                }
+                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(TabBarController(), animated: true)
+            }
         }
     }
 }

@@ -160,7 +160,7 @@ private extension LoginViewController {
     // MARK: - Firebase 로그인
     
     private func loginFirebase(email: String, password: String) {
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] _, error in
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] authData, error in
             guard let self = self else { return }
             
             if let error = error {
@@ -168,19 +168,26 @@ private extension LoginViewController {
                 print(error.localizedDescription)
             }
             else {
-                if let hobbyList = MyProfile.shared.myUserInfo?.hobbyList, !hobbyList.isEmpty {
-                    let mainBarController = TabBarController()
-                    (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(mainBarController, animated: true)
-                }
-                else {
-                    if let navigationController = self.navigationController {
-                        let categorySelectVC = CategorySelectViewController(email: email, password: password)
-                        navigationController.pushViewController(categorySelectVC, animated: true)
-                    }
-                    else {
-                        let categorySelectVC = CategorySelectViewController(email: email, password: password)
-                        let navigationController = UINavigationController(rootViewController: categorySelectVC)
-                        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(navigationController, animated: true)
+                guard let uid = authData?.user.uid else { return }
+                MyProfile.shared.getUserProfile(uid: uid) { isSuccess in
+                    if isSuccess {
+                        if let hobbyList = MyProfile.shared.myUserInfo?.hobbyList, !hobbyList.isEmpty {
+                            let mainBarController = TabBarController()
+                            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(mainBarController, animated: true)
+                        }
+                        else {
+                            if let navigationController = self.navigationController {
+                                let categorySelectVC = CategorySelectViewController(email: email, password: password)
+                                navigationController.pushViewController(categorySelectVC, animated: true)
+                            }
+                            else {
+                                let categorySelectVC = CategorySelectViewController(email: email, password: password)
+                                let navigationController = UINavigationController(rootViewController: categorySelectVC)
+                                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootVC(navigationController, animated: true)
+                            }
+                        }
+                    } else {
+                        print("로그인 정보를 불러오지 못했습니다.")
                     }
                 }
             }

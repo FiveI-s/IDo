@@ -72,13 +72,9 @@ class HomeViewController : UIViewController {
         self.makeTableView()
         self.HomeViewTopControllerSet()
         self.navigationBar()
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        MyProfile.shared.getUserProfile(uid: uid) { _ in
-            print("Test: \(MyProfile.shared.myUserInfo?.myClubList?.count)")
-            self.updateUIBasedOnData()
-            self.makeTableView2()
-            self.setLayout()
-        }
+        self.updateUIBasedOnData()
+        self.makeTableView2()
+        self.setLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -230,6 +226,9 @@ private extension HomeViewController {
             make.leading.equalToSuperview().offset(7) // 또는 적절한 값을 사용
             make.top.bottom.trailing.equalToSuperview()
         }
+        let backBarButtonItem = UIBarButtonItem(title: "뒤로가기", style: .plain, target: self, action: nil)
+        backBarButtonItem.tintColor = .black
+        navigationItem.backBarButtonItem = backBarButtonItem
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: containerView)
     }
 }

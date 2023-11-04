@@ -67,8 +67,8 @@ class NoticeBoardTableViewCell: UITableViewCell {
     private(set) lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.text = "홍준영"
-        label.font = UIFont.bodyFont(.xSmall, weight: .medium)
-        label.textColor = UIColor.black
+        label.font = UIFont.bodyFont(.small, weight: .medium)
+        label.textColor = UIColor(color: .textStrong)
         return label
     }()
     
@@ -76,7 +76,7 @@ class NoticeBoardTableViewCell: UITableViewCell {
     private(set) lazy var timeLabel: UILabel = {
         let label = UILabel()
         label.text = "10월 11일 오후 3:43"
-        label.font = UIFont.bodyFont(.xSmall, weight: .medium)
+        label.font = UIFont.bodyFont(.xSmall, weight: .regular)
         label.textAlignment = .right
         label.textColor = UIColor.systemGray
         return label
@@ -97,7 +97,8 @@ class NoticeBoardTableViewCell: UITableViewCell {
     private(set) lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "같이 합주 할 사람!!!"
-        label.font = UIFont.bodyFont(.large, weight: .medium)
+        label.font = UIFont.bodyFont(.medium, weight: .bold)
+        label.textColor = UIColor(color: .textStrong)
         return label
     }()
     
@@ -105,7 +106,8 @@ class NoticeBoardTableViewCell: UITableViewCell {
     private(set) lazy var contentLabel: UILabel = {
         let label = UILabel()
         label.text = "이번주 토요일날 같이 장안구에서 합주 할 사람 모여라!!!이번주 토요일날 같이 장안구에서 합주 할 사람 모여라!!!이번주 토요일날 같이 장안구에서 합주 할 사람 모여라!!!"
-        label.font = UIFont.bodyFont(.small, weight: .medium)
+        label.font = UIFont.bodyFont(.small, weight: .regular)
+        label.textColor = UIColor(color: .textStrong)
         label.numberOfLines = 2
         return label
     }()

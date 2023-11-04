@@ -66,6 +66,11 @@ final class NoticeMeetingController: TabmanViewController {
         super.viewDidLoad()
         authCheck()
         setupTabman()
+        
+        // 네비게이션 백 버튼의 이름 설정
+        let backBarButtonItem = UIBarButtonItem(title: "뒤로가기", style: .plain, target: self, action: nil)
+        backBarButtonItem.tintColor = .black
+        navigationItem.backBarButtonItem = backBarButtonItem
     }
     
     func setupTabman() {
@@ -223,11 +228,6 @@ extension NoticeMeetingController {
         updateNoticeBoardVC.updateHandler = { [weak self] club, data in
             self?.homeVC.update(club: club, imageData: data)
         }
-
-        // 네비게이션 백 버튼의 이름 설정
-        let backBarButtonItem = UIBarButtonItem(title: "뒤로가기", style: .plain, target: self, action: nil)
-        backBarButtonItem.tintColor = .black
-        navigationItem.backBarButtonItem = backBarButtonItem
         
         navigationController?.pushViewController(updateNoticeBoardVC, animated: true) // 모임 수정 페이지
     }

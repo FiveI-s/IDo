@@ -403,13 +403,19 @@ extension CreateNoticeBoardViewController: RemoveDelegate {
         } completion: { _ in
             
             // 딕셔너리의 키를 재정렬
-            let keys = self.firebaseManager.selectedImage.keys.compactMap { Int($0) }.sorted()
             var newSelectedImage: [String: UIImage] = [:]
-            for (index, key) in keys.enumerated() where key > indexPath.row {
-                
-                // 키 값을 재정렬하기 전에 현재 이미지를 새로운 키로 이동
-                newSelectedImage[String(index)] = self.firebaseManager.selectedImage[String(key)]
+            let sortedKeys = self.firebaseManager.selectedImage.keys.compactMap { Int($0) }.sorted()
+            
+            // 재정렬할 때 사용할 새 인덱스
+            var newIndex = 0
+            
+            for key in sortedKeys {
+                if let image = self.firebaseManager.selectedImage[String(key)] {
+                    newSelectedImage[String(newIndex)] = image
+                    newIndex += 1
+                }
             }
+            
             // 재정렬된 이미지 딕셔너리를 업데이트
             self.firebaseManager.selectedImage = newSelectedImage
             

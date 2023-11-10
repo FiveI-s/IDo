@@ -18,7 +18,7 @@ class CommentStackView: UIStackView {
     let profileImageView: BasicImageView = {
         let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
         imageView.contentMargin = 4
-        imageView.backgroundColor = UIColor(color: .contentPrimary)
+        imageView.backgroundColor = UIColor(color: .contentBackground)
         imageView.layer.masksToBounds = true
         return imageView
     }()

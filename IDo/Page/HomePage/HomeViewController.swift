@@ -203,6 +203,7 @@ extension HomeViewController : UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? BasicCell else { return }
         guard let currentUserClubList = MyProfile.shared.myUserInfo?.myClubList else { return }
         let noticeBoardVC = NoticeMeetingController(club: currentUserClubList[indexPath.row], currentUser: MyProfile.shared.myUserInfo!)
+        TemporaryManager.shared.categoryData = currentUserClubList[indexPath.row].category
         navigationController?.pushViewController(noticeBoardVC, animated: true)
     }
 }

@@ -264,14 +264,17 @@ extension NoticeHomeController: UITableViewDelegate, UITableViewDataSource {
             let user = userList[indexPath.row]
             cell.nameLabel.text = user.nickName
             cell.descriptionLabel.text = user.description
-            cell.profileImageView.image = nil
-            guard let profilePath = user.profileImagePath else { return cell }
+            cell.profileImageView.imageView.image = nil
+            guard let profilePath = user.profileImagePath else {
+                if let defaultImage = UIImage(systemName: "person.fill") {
+                    cell.setUserImage(profileImage: defaultImage, color: UIColor(color: .contentBackground))
+                }
+                return cell }
             FBURLCache.shared.downloadURL(storagePath: profilePath + "/\(ImageSize.small.rawValue)") { result in
                 switch result {
                 case .success(let image):
                     DispatchQueue.main.async {
-                        cell.profileImageView.image = image
-                        cell.profileImageView.backgroundColor = UIColor(color: .white)
+                        cell.setUserImage(profileImage: image, color: UIColor(color: .white), margin: 0)
                     }
                 case .failure(let error):
                     print(error.localizedDescription)

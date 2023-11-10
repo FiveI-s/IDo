@@ -9,10 +9,13 @@ import UIKit
 
 final class MemberTableViewCell: UITableViewCell, Reusable {
 
-    let profileImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "person"))
+    let profileImageView: BasicImageView = {
+        let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
         imageView.backgroundColor = UIColor(color: .contentBackground)
-        imageView.tintColor = UIColor(color: .white)
+        imageView.contentMargin = 4
+        imageView.tintColor = UIColor.white
+        imageView.layer.cornerRadius = 18
+        imageView.layer.masksToBounds = true
         return imageView
     }()
     
@@ -80,7 +83,18 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        profileImageView.image = nil
+        profileImageView.imageView.image = nil
     }
 
+}
+
+extension MemberTableViewCell {
+    
+    func setUserImage(profileImage: UIImage, color: UIColor, margin: CGFloat = 4) {
+        DispatchQueue.main.async {
+            self.profileImageView.imageView.image = profileImage
+            self.profileImageView.imageView.backgroundColor = color
+            self.profileImageView.contentMargin = margin
+        }
+    }
 }

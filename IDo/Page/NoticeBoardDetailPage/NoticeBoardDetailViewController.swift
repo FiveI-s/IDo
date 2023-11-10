@@ -406,7 +406,7 @@ extension NoticeBoardDetailViewController: UITableViewDelegate, UITableViewDataS
               let currentUser else { return UITableViewCell() }
         cell.selectionStyle = .none
         if let defaultImage = UIImage(systemName: "person.fill") {
-            cell.setUserImage(profileImage: defaultImage, color: UIColor(color: .contentPrimary))
+            cell.setUserImage(profileImage: defaultImage, color: UIColor(color: .contentBackground))
         }
         let comment = firebaseCommentManager.modelList[indexPath.row]
         firebaseCommentManager.getUserImage(referencePath: comment.writeUser.profileImagePath, imageSize: .small) { image in

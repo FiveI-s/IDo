@@ -31,7 +31,7 @@ class NoticeBoardTableViewCell: UITableViewCell {
         if let indexPath {
             FBURLCache.shared.cancelDownloadURL(indexPath: indexPath)
         }
-        profileImageView.image = nil
+        profileImageView.imageView.image = nil
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -58,13 +58,13 @@ class NoticeBoardTableViewCell: UITableViewCell {
     }()
     
     // 작성자 프로필 사진
-    private(set) lazy var profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleToFill
+    private(set) lazy var profileImageView: BasicImageView = {
+        let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
+        imageView.backgroundColor = UIColor(color: .contentBackground)
+        imageView.contentMargin = 4
+        imageView.tintColor = UIColor.white
         imageView.layer.cornerRadius = 18
         imageView.layer.masksToBounds = true
-        imageView.image = UIImage(systemName: "person.circle.fill")
-        imageView.tintColor = UIColor(color: .main)
         return imageView
     }()
     
@@ -195,6 +195,16 @@ private extension NoticeBoardTableViewCell {
         
         commentImageView.snp.makeConstraints { make in
             make.width.height.equalTo(15)
+        }
+    }
+}
+extension NoticeBoardTableViewCell {
+    
+    func setUserImage(profileImage: UIImage, color: UIColor, margin: CGFloat = 4) {
+        DispatchQueue.main.async {
+            self.profileImageView.imageView.image = profileImage
+            self.profileImageView.imageView.backgroundColor = color
+            self.profileImageView.contentMargin = margin
         }
     }
 }

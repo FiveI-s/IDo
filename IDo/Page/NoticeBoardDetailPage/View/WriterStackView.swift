@@ -18,7 +18,7 @@ final class WriterStackView: UIStackView {
     }()
     let writerImageView: BasicImageView = {
         let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
-        imageView.backgroundColor = UIColor(color: .contentPrimary)
+        imageView.backgroundColor = UIColor(color: .contentBackground)
         imageView.contentMargin = 4
         imageView.layer.cornerRadius = 18
         imageView.layer.masksToBounds = true

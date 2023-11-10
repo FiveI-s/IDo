@@ -13,6 +13,8 @@ import SwiftSMTP
 import UIKit
 //  회원가입 페이지
 final class SignUpViewController: UIViewController {
+    private let signUpView = SignUpView()
+
     private let fbUserDatabaseManager: FirebaseCreateUserManager = .init(refPath: ["Users"])
     
     var smtp: SMTP!
@@ -20,210 +22,10 @@ final class SignUpViewController: UIViewController {
     var isEmailChecked: Bool = false
     var isButtonClicked: Bool = false
     var isPrivacyPolicy: Bool = false
-
-    var passwordErrorLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .red
-        label.text = "(최소 8자, 소문자, 숫자, 특수문자 필요)"
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.isHidden = true
-        return label
-    }()
-
-    var passwordConfirmErrorLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .green
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.isHidden = true
-        return label
-    }()
-
-    var eyeButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        button.backgroundColor = .clear
-        button.tintColor = .black
-        button.setImage(UIImage(systemName: "eye.slash"), for: .normal)
-        button.setImage(UIImage(systemName: "eye"), for: .selected)
-
-        return button
-    }()
-
-    var confirmEyeButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        button.backgroundColor = .clear
-        button.tintColor = .black
-        button.setImage(UIImage(systemName: "eye.slash"), for: .normal)
-        button.setImage(UIImage(systemName: "eye"), for: .selected)
-
-        return button
-    }()
-
-    private let backButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("〈 뒤로가기", for: .normal)
-        button.titleLabel?.font = UIFont.bodyFont(.large, weight: .medium)
-        button.setTitleColor(UIColor(color: .contentPrimary), for: .normal)
-        return button
-    }()
-
-    private let linkButton: UIButton = {
-        let btn = UIButton()
-        btn.setTitle("중복확인", for: .normal)
-        btn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        btn.setTitleColor(UIColor(color: .text2), for: .normal)
-
-        return btn
-    }()
-
-    private let idLable: UILabel = {
-        let label = UILabel()
-        label.text = "이메일"
-        return label
-    }()
-
-    private let passwordLable: UILabel = {
-        let label = UILabel()
-        label.text = "비밀번호"
-        return label
-    }()
-
-    private let passwordConfirmLable: UILabel = {
-        let label = UILabel()
-        label.text = "비밀번호 재확인"
-        return label
-    }()
-
-    private let emailTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "이메일을 입력해주세요"
-        textField.font = .bodyFont(.large, weight: .regular)
-        textField.textColor = UIColor(color: .textStrong)
-        textField.borderStyle = .roundedRect
-        textField.autocapitalizationType = .none
-        
-        return textField
-    }()
-
-    private let passwordTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "비밀번호를 입력해주세요"
-        textField.font = .bodyFont(.large, weight: .regular)
-        textField.textColor = UIColor(color: .textStrong)
-        textField.autocapitalizationType = .none
-        textField.borderStyle = .roundedRect
-        textField.isSecureTextEntry = true
-        textField.textContentType = .oneTimeCode
-        return textField
-    }()
-
-    private let passwordConfirmTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "비밀번호를 재입력해주세요"
-        textField.font = .bodyFont(.large, weight: .regular)
-        textField.textColor = UIColor(color: .textStrong)
-        textField.autocapitalizationType = .none
-        textField.borderStyle = .roundedRect
-        textField.isSecureTextEntry = true
-        textField.textContentType = .oneTimeCode
-        return textField
-    }()
-
-    private let authenticationNumberTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "인증번호"
-        textField.font = .bodyFont(.large, weight: .regular)
-        textField.textColor = UIColor(color: .textStrong)
-        textField.borderStyle = .roundedRect
-        return textField
-    }()
-
-    private let emailAuthorizationButton: UIButton = {
-        let btn = UIButton()
-        btn.setTitle("인증", for: .normal)
-        btn.setTitleColor(UIColor(color: .white), for: .normal)
-        btn.titleLabel?.font = UIFont.bodyFont(.large, weight: .regular)
-        btn.backgroundColor = UIColor(color: .contentPrimary)
-        btn.layer.cornerRadius = 5
-        return btn
-    }()
-
-    private let authenticationNumberButton: UIButton = {
-        let btn = UIButton()
-        btn.setTitle("확인", for: .normal)
-        btn.setTitleColor(UIColor(color: .white), for: .normal)
-        btn.titleLabel?.font = UIFont.bodyFont(.large, weight: .regular)
-        btn.backgroundColor = UIColor(color: .contentPrimary)
-        btn.layer.cornerRadius = 5
-        return btn
-    }()
-
-    lazy var termsCheckButton: UIButton = {
-        var button = UIButton(type: .custom)
-        button.setImage(UIImage(systemName: "rectangle"), for: .normal)
-        button.setImage(UIImage(systemName: "checkmark.rectangle"), for: .selected)
-        button.layer.cornerRadius = 5
-        button.backgroundColor = .white
-        return button
-    }()
-
-    private let termsLabel: UILabel = {
-        let label = UILabel()
-        label.text = "이용약관 동의"
-        label.textColor = .darkGray
-        label.font = UIFont.bodyFont(.small, weight: .regular)
-        label.textAlignment = .left
-        label.numberOfLines = 1
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
-        return label
-    }()
-
-    lazy var termsStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [termsCheckButton, termsLabel])
-        stackView.spacing = 12
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        return stackView
-    }()
     
-    lazy var privacyPolicycheckButton: UIButton = {
-        var button = UIButton(type: .custom)
-        button.setImage(UIImage(systemName: "rectangle"), for: .normal)
-        button.setImage(UIImage(systemName: "checkmark.rectangle"), for: .selected)
-        button.layer.cornerRadius = 5
-        button.backgroundColor = .white
-        return button
-    }()
-    
-    private let privacyPolicyLabel: UILabel = {
-        let label = UILabel()
-        label.text = "개인정보처리방침 동의"
-        label.textColor = .darkGray
-        label.font = UIFont.bodyFont(.small, weight: .regular)
-        label.textAlignment = .left
-        label.numberOfLines = 1
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
-        return label
-    }()
-    
-    lazy var privacyPolicyStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [privacyPolicycheckButton, privacyPolicyLabel])
-        stackView.spacing = 12
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        return stackView
-    }()
-
-    private let nextButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("가입하기", for: .normal)
-        button.setTitleColor(UIColor(color: .white), for: .normal)
-        button.titleLabel?.font = UIFont.bodyFont(.large, weight: .medium)
-        button.backgroundColor = UIColor(color: .contentPrimary)
-        button.layer.cornerRadius = 5
-        return button
-    }()
+    override func loadView() {
+        view = signUpView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -233,13 +35,10 @@ final class SignUpViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        // navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     private func navigationSet() {
@@ -261,164 +60,30 @@ final class SignUpViewController: UIViewController {
 private extension SignUpViewController {
     func setup() {
         view.backgroundColor = .white
-        addViews()
-        autolayoutSetup()
         setupButton()
         setupKeyboardEvent()
         setupHyperLink()
-        emailTextField.delegate = self
-        authenticationNumberTextField.delegate = self
-        passwordTextField.delegate = self
-        passwordConfirmTextField.delegate = self
+        signUpView.emailTextField.delegate = self
+        signUpView.authenticationNumberTextField.delegate = self
+        signUpView.passwordTextField.delegate = self
+        signUpView.passwordConfirmTextField.delegate = self
     }
-    
-    func addViews() {
-        view.addSubview(emailTextField)
-        view.addSubview(linkButton)
-        view.addSubview(passwordTextField)
-        view.addSubview(nextButton)
-        // view.addSubview(backButton)
-        view.addSubview(idLable)
-        view.addSubview(passwordLable)
-        view.addSubview(passwordConfirmLable)
-        view.addSubview(passwordTextField)
-        view.addSubview(passwordConfirmTextField)
-        view.addSubview(emailAuthorizationButton)
-        view.addSubview(authenticationNumberTextField)
-        view.addSubview(authenticationNumberButton)
-        view.addSubview(passwordErrorLabel)
-        view.addSubview(passwordConfirmErrorLabel)
-        view.addSubview(termsStackView)
-        view.addSubview(privacyPolicyStackView)
-    }
-    
-    func autolayoutSetup() {
-        let safeArea = view.safeAreaLayoutGuide
-//        backButton.snp.makeConstraints { make in
-//            make.top.left.equalTo(safeArea).inset(Constant.margin3)
-//        }
-        passwordTextField.rightView = eyeButton
-        passwordTextField.rightViewMode = .always
-        
-        passwordConfirmTextField.rightView = confirmEyeButton
-        passwordConfirmTextField.rightViewMode = .always
-        let contentHeight = 48
-        
-        idLable.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(Constant.margin3)
-//            make.top.equalTo(backButton.snp.bottom).offset(Constant.margin3)
-            make.leading.trailing.equalToSuperview().inset(Constant.margin4)
-        }
-        
-        emailTextField.snp.makeConstraints { make in
-            make.top.equalTo(idLable.snp.bottom).offset(Constant.margin2)
-            make.left.equalToSuperview().inset(Constant.margin4)
-            make.height.equalTo(contentHeight)
-        }
-        
-        linkButton.snp.makeConstraints { make in
-            make.centerY.equalTo(emailTextField)
-            make.trailing.equalTo(emailTextField.snp.trailing).inset(5)
-        }
-        emailAuthorizationButton.snp.makeConstraints { make in
-            make.centerY.equalTo(emailTextField)
-            make.right.equalToSuperview().inset(Constant.margin4)
-            make.width.equalTo(60)
-            make.height.equalTo(contentHeight)
-            make.left.equalTo(emailTextField.snp.right).offset(Constant.margin2)
-        }
-        authenticationNumberTextField.snp.makeConstraints { make in
-            make.top.equalTo(emailTextField.snp.bottom).offset(Constant.margin2)
-            make.left.equalToSuperview().inset(Constant.margin4)
-            make.height.equalTo(contentHeight)
-        }
-        
-        authenticationNumberButton.snp.makeConstraints { make in
-            make.centerY.equalTo(authenticationNumberTextField)
-            make.right.equalToSuperview().inset(Constant.margin4)
-            make.width.equalTo(60)
-            make.height.equalTo(contentHeight)
-            make.left.equalTo(authenticationNumberTextField.snp.right).offset(Constant.margin2)
-        }
-        
-        passwordLable.snp.makeConstraints { make in
-            make.top.equalTo(authenticationNumberButton.snp.bottom).offset(Constant.margin3)
-            make.leading.trailing.equalToSuperview().inset(Constant.margin4)
-        }
-        passwordTextField.snp.makeConstraints { make in
-            make.top.equalTo(passwordLable.snp.bottom).offset(Constant.margin2)
-            make.left.right.equalToSuperview().inset(Constant.margin4)
-            make.height.equalTo(contentHeight)
-        }
-        passwordErrorLabel.snp.makeConstraints { make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(Constant.margin1)
-            make.leading.trailing.equalToSuperview().inset(Constant.margin4)
-        }
-        passwordConfirmLable.snp.makeConstraints { make in
-            make.top.equalTo(passwordErrorLabel.snp.bottom).offset(Constant.margin2)
-            make.left.right.equalToSuperview().inset(Constant.margin4)
-        }
-        passwordConfirmTextField.snp.makeConstraints { make in
-            make.top.equalTo(passwordConfirmLable.snp.bottom).offset(Constant.margin2)
-            make.left.right.equalToSuperview().inset(Constant.margin4)
-            make.height.equalTo(contentHeight)
-        }
-        passwordConfirmErrorLabel.snp.makeConstraints { make in
-            make.top.equalTo(passwordConfirmTextField.snp.bottom).offset(Constant.margin1)
-            make.left.right.equalToSuperview().inset(Constant.margin4)
-        }
-        
-        termsStackView.snp.makeConstraints { make in
-            make.top.equalTo(passwordConfirmErrorLabel.snp.bottom).offset(Constant.margin2)
-            make.left.equalToSuperview().inset(Constant.margin4)
-            make.right.equalToSuperview().inset(Constant.margin4)
-        }
-        termsCheckButton.snp.makeConstraints { make in
-            make.width.equalTo(15)
-            make.height.equalTo(15)
-        }
-        
-        privacyPolicyStackView.snp.makeConstraints { make in
-            make.top.equalTo(termsStackView.snp.bottom).offset(Constant.margin2)
-            make.left.equalToSuperview().inset(Constant.margin4)
-            make.right.equalToSuperview().inset(Constant.margin4)
-        }
-        privacyPolicycheckButton.snp.makeConstraints { make in
-            make.width.equalTo(15)
-            make.height.equalTo(15)
-        }
-        
-        nextButton.snp.makeConstraints { make in
-            make.bottom.equalTo(safeArea).inset(Constant.margin3)
-            make.left.right.equalToSuperview().inset(Constant.margin3)
-            make.height.equalTo(48)
-        }
-    }
-    
+
     func setupButton() {
-        nextButton.addTarget(self, action: #selector(clickNextButton), for: .touchUpInside)
-        
-        // backButton.addTarget(self, action: #selector(clickBackButton), for: .touchUpInside)
-        
-        eyeButton.addTarget(self, action: #selector(eyeClickButton), for: .touchUpInside)
-        
-        confirmEyeButton.addTarget(self, action: #selector(confirmEyeClickButton), for: .touchUpInside)
-        
-        linkButton.addTarget(self, action: #selector(clickLinkButton), for: .touchUpInside)
-        
-        emailAuthorizationButton.addTarget(self, action: #selector(addSMTPButton), for: .touchUpInside)
-        
-        authenticationNumberButton.addTarget(self, action: #selector(addSMTPNumberButton), for: .touchUpInside)
-        
-        termsCheckButton.addTarget(self, action: #selector(termsCheckButtonAction), for: .touchUpInside)
-        
-        privacyPolicycheckButton.addTarget(self, action: #selector(privacyPolicycheckButtonAction), for: .touchUpInside)
+        signUpView.nextButton.addTarget(self, action: #selector(clickNextButton), for: .touchUpInside)
+        signUpView.eyeButton.addTarget(self, action: #selector(eyeClickButton), for: .touchUpInside)
+        signUpView.confirmEyeButton.addTarget(self, action: #selector(confirmEyeClickButton), for: .touchUpInside)
+        signUpView.linkButton.addTarget(self, action: #selector(clickLinkButton), for: .touchUpInside)
+        signUpView.emailAuthorizationButton.addTarget(self, action: #selector(addSMTPButton), for: .touchUpInside)
+        signUpView.authenticationNumberButton.addTarget(self, action: #selector(addSMTPNumberButton), for: .touchUpInside)
+        signUpView.termsCheckButton.addTarget(self, action: #selector(termsCheckButtonAction), for: .touchUpInside)
+        signUpView.privacyPolicycheckButton.addTarget(self, action: #selector(privacyPolicycheckButtonAction), for: .touchUpInside)
         // 텍스트 필드 감지
-        emailTextField.addTarget(self, action: #selector(emailTextFieldDidChange(_:)), for: .editingChanged)
+        signUpView.emailTextField.addTarget(self, action: #selector(emailTextFieldDidChange(_:)), for: .editingChanged)
     }
-    
+
     func setupHyperLink() {
-        guard let termsText = termsLabel.text else { return }
+        guard let termsText = signUpView.termsLabel.text else { return }
         let termsAttributedString = NSMutableAttributedString(string: termsText)
         let termsRange = (termsText as NSString).range(of: "이용약관")
         let termsLinkAttributes: [NSAttributedString.Key: Any] = [
@@ -430,13 +95,13 @@ private extension SignUpViewController {
         termsAttributedString.addAttributes(termsLinkAttributes, range: termsRange)
 
         // UILabel에 NSAttributedString 설정
-        termsLabel.attributedText = termsAttributedString
+        signUpView.termsLabel.attributedText = termsAttributedString
 
         // UILabel의 텍스트 선택 가능하게 설정
-        termsLabel.isUserInteractionEnabled = true
-        termsLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(termsOfUseTap)))
+        signUpView.termsLabel.isUserInteractionEnabled = true
+        signUpView.termsLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(termsOfUseTap)))
         
-        guard let privacyPolicyText = privacyPolicyLabel.text else { return }
+        guard let privacyPolicyText = signUpView.privacyPolicyLabel.text else { return }
         let privacyPolicyAttributedString = NSMutableAttributedString(string: privacyPolicyText)
         let privacyPolicyRange = (privacyPolicyText as NSString).range(of: "개인정보처리방침")
         let privacyPolicyLinkAttributes: [NSAttributedString.Key: Any] = [
@@ -448,39 +113,39 @@ private extension SignUpViewController {
         privacyPolicyAttributedString.addAttributes(privacyPolicyLinkAttributes, range: privacyPolicyRange)
 
         // UILabel에 NSAttributedString 설정
-        privacyPolicyLabel.attributedText = privacyPolicyAttributedString
+        signUpView.privacyPolicyLabel.attributedText = privacyPolicyAttributedString
 
         // UILabel의 텍스트 선택 가능하게 설정
-        privacyPolicyLabel.isUserInteractionEnabled = true
-        privacyPolicyLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(privacyPolicyLabelTap)))
+        signUpView.privacyPolicyLabel.isUserInteractionEnabled = true
+        signUpView.privacyPolicyLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(privacyPolicyLabelTap)))
     }
     
     @objc func clickNextButton() {
-        nextButton.isEnabled = false
+        signUpView.nextButton.isEnabled = false
         defer {
-            nextButton.isEnabled = true
+            signUpView.nextButton.isEnabled = true
         }
 
         if let errorMessage = errorProcessing() {
             showAlertDialog(title: "경고", message: errorMessage)
-            nextButton.isEnabled = true
+            signUpView.nextButton.isEnabled = true
             return
         }
         
-        Auth.auth().createUser(withEmail: emailTextField.text!, password: passwordTextField.text!) { [weak self] authDataResult, error in
+        Auth.auth().createUser(withEmail: signUpView.emailTextField.text!, password: signUpView.passwordTextField.text!) { [weak self] authDataResult, error in
             if let error = error {
-                self?.nextButton.isEnabled = true
+                self?.signUpView.nextButton.isEnabled = true
                 let nsError = error as NSError
                 let errorCode = AuthErrorCode(_nsError: nsError)
                 print(errorCode)
                 switch errorCode.code {
                 case .emailAlreadyInUse:
                     self?.showAlertDialog(title: "경고", message: "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.")
-                    self?.emailAuthorizationButton.isEnabled = true
-                    self?.emailTextField.isEnabled = true
-                    self?.linkButton.isEnabled = true
-                    self?.emailAuthorizationButton.setTitleColor(UIColor(color: .white), for: .normal)
-                    self?.emailAuthorizationButton.backgroundColor = UIColor(color: .contentPrimary)
+                    self?.signUpView.emailAuthorizationButton.isEnabled = true
+                    self?.signUpView.emailTextField.isEnabled = true
+                    self?.signUpView.linkButton.isEnabled = true
+                    self?.signUpView.emailAuthorizationButton.setTitleColor(UIColor(color: .white), for: .normal)
+                    self?.signUpView.emailAuthorizationButton.backgroundColor = UIColor(color: .contentPrimary)
                     return
                 case .weakPassword:
                     self?.showAlertDialog(title: "경고", message: "안정성이 낮은 비밀번호입니다.")
@@ -493,7 +158,7 @@ private extension SignUpViewController {
             } else {
                 guard let authDataResult = authDataResult else { return }
                 let uid = authDataResult.user.uid
-                let user = IDoUser(id: uid, updateAt: Date().toString(), email: self?.emailTextField.text!, nickName: "", description: nil, hobbyList: nil)
+                let user = IDoUser(id: uid, updateAt: Date().toString(), email: self?.signUpView.emailTextField.text!, nickName: "", description: nil, hobbyList: nil)
                 self?.fbUserDatabaseManager.model = user
                 self?.fbUserDatabaseManager.appendData(data: user)
                 self?.navigateToCategorySelection()
@@ -502,28 +167,28 @@ private extension SignUpViewController {
     }
 
     private func errorProcessing() -> String? {
-        guard let email = emailTextField.text, !email.isEmpty else {
+        guard let email = signUpView.emailTextField.text, !email.isEmpty else {
             return "이메일 또는 비밀번호를 입력하세요."
         }
         
-        guard let password = passwordTextField.text, !password.isEmpty, password.isValidPassword() else {
+        guard let password = signUpView.passwordTextField.text, !password.isEmpty, password.isValidPassword() else {
             return "비밀번호가 안전하지 않습니다."
         }
         
-        guard let confirmPassword = passwordConfirmTextField.text, !confirmPassword.isEmpty, password == confirmPassword else {
+        guard let confirmPassword = signUpView.passwordConfirmTextField.text, !confirmPassword.isEmpty, password == confirmPassword else {
             return "비밀번호 재확인을 입력하세요."
         }
         
-        guard termsCheckButton.isSelected else {
+        guard signUpView.termsCheckButton.isSelected else {
             return "이용약관에 동의해주세요."
         }
         
-        guard privacyPolicycheckButton.isSelected else {
+        guard signUpView.privacyPolicycheckButton.isSelected else {
             return "개인정보처리방침에 동의해주세요."
         }
         
-        if authenticationNumberButton.title(for: .normal) != "완료",
-           authenticationNumberTextField.text?.isEmpty != false
+        if signUpView.authenticationNumberButton.title(for: .normal) != "완료",
+           signUpView.authenticationNumberTextField.text?.isEmpty != false
         {
             return "인증번호를 입력하거나 확인해주세요."
         }
@@ -532,8 +197,8 @@ private extension SignUpViewController {
     }
 
     private func navigateToCategorySelection() {
-        let email = emailTextField.text!
-        let password = passwordTextField.text!
+        let email = signUpView.emailTextField.text!
+        let password = signUpView.passwordTextField.text!
         let categoryVC = CategorySelectViewController(email: email, password: password)
         navigationController?.pushViewController(categoryVC, animated: true)
     }
@@ -563,17 +228,17 @@ private extension SignUpViewController {
     }
     
     func smtpNumberCode(completion: @escaping (Bool) -> Void) {
-        guard let userInputCode = authenticationNumberTextField.text else {
+        guard let userInputCode = signUpView.authenticationNumberTextField.text else {
             completion(false)
             return
         }
         if let savedCode = UserDefaults.standard.string(forKey: "emailVerificationCode"), savedCode == userInputCode {
             isEmailChecked = true
-            emailTextField.isEnabled = false
+            signUpView.emailTextField.isEnabled = false
             completion(true)
         } else {
-            emailAuthorizationButton.isEnabled = true
-            authenticationNumberTextField.text = ""
+            signUpView.emailAuthorizationButton.isEnabled = true
+            signUpView.authenticationNumberTextField.text = ""
             showAlertDialog(title: "경고", message: "인증번호가 일치하지 않습니다.")
             completion(false)
         }
@@ -585,16 +250,7 @@ private extension SignUpViewController {
         }
     }
     
-    func setupKeyboardEvent() {
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(keyboardWillShow),
-//                                               name: UIResponder.keyboardWillShowNotification,
-//                                               object: nil)
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(keyboardWillHide),
-//                                               name: UIResponder.keyboardWillHideNotification,
-//                                               object: nil)
-    }
+    func setupKeyboardEvent() {}
     
     @objc func keyboardWillShow(_ sender: Notification) {
         // keyboardFrame: 현재 동작하고 있는 이벤트에서 키보드의 frame을 받아옴
@@ -630,7 +286,7 @@ private extension SignUpViewController {
             showAlertDialog(title: "경고", message: "중복확인 버튼을 눌러주세요.")
             return
         }
-        guard let emailText = emailTextField.text,
+        guard let emailText = signUpView.emailTextField.text,
               !emailText.isEmpty,
               isValidEmail(emailText)
         else {
@@ -648,7 +304,7 @@ private extension SignUpViewController {
         let smtp = SMTP(hostname: "smtp.naver.com", email: "ido345849@naver.com", password: "UX5W8Y7VUHLW")
         
         let drLight = Mail.User(name: "iDo", email: "ido345849@naver.com")
-        let megaman = Mail.User(name: "사용자", email: emailTextField.text!)
+        let megaman = Mail.User(name: "사용자", email: signUpView.emailTextField.text!)
         
         let code = "\(Int.random(in: 100000 ... 999999))"
         print("code: \(code)")
@@ -673,13 +329,13 @@ private extension SignUpViewController {
 
     @objc func emailTextFieldDidChange(_ textField: UITextField) {
         // 중복확인 버튼을 활성화해요.
-        linkButton.isEnabled = true
+        signUpView.linkButton.isEnabled = true
         // 인증 상태를 재설정해요.
         isEmailChecked = false
     }
 
     @objc func addSMTPNumberButton() {
-        guard let email = emailTextField.text, !email.isEmpty else {
+        guard let email = signUpView.emailTextField.text, !email.isEmpty else {
             showAlertDialog(title: "경고", message: "이메일을 입력해주세요.")
             return
         }
@@ -688,36 +344,36 @@ private extension SignUpViewController {
             if let error = error {
                 print("Error checking for email existence: \(error)")
                 self?.showAlertDialog(title: "오류", message: "이메일 확인 중 오류가 발생했습니다.")
-                self?.emailTextField.isEnabled = true
-                self?.linkButton.isEnabled = true
+                self?.signUpView.emailTextField.isEnabled = true
+                self?.signUpView.linkButton.isEnabled = true
                 return
             }
                 
             if let signInMethods = signInMethods, !signInMethods.isEmpty {
                 self?.showAlertDialog(title: "경고", message: "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.")
-                self?.emailTextField.isEnabled = true
-                self?.linkButton.isEnabled = false
+                self?.signUpView.emailTextField.isEnabled = true
+                self?.signUpView.linkButton.isEnabled = false
             } else {
                 self?.smtpNumberCode { success in
                     if success {
-                        self?.emailTextField.isEnabled = false
+                        self?.signUpView.emailTextField.isEnabled = false
                         self?.isEmailChecked = true
-                        self?.linkButton.isEnabled = false
+                        self?.signUpView.linkButton.isEnabled = false
 
                         self?.showAlertDialog(title: "인증", message: "인증이 성공적으로 처리되었습니다")
                             
-                        self?.authenticationNumberButton.setTitle("완료", for: .normal)
-                        self?.authenticationNumberButton.isEnabled = false
-                        self?.authenticationNumberButton.setTitleColor(UIColor(color: .borderSelected), for: .normal)
-                        self?.authenticationNumberButton.backgroundColor = UIColor(color: .contentBackground)
-                        self?.emailAuthorizationButton.isEnabled = false
-                        self?.emailAuthorizationButton.setTitleColor(.darkGray, for: .normal)
-                        self?.emailAuthorizationButton.backgroundColor = UIColor(color: .placeholder)
+                        self?.signUpView.authenticationNumberButton.setTitle("완료", for: .normal)
+                        self?.signUpView.authenticationNumberButton.isEnabled = false
+                        self?.signUpView.authenticationNumberButton.setTitleColor(UIColor(color: .borderSelected), for: .normal)
+                        self?.signUpView.authenticationNumberButton.backgroundColor = UIColor(color: .contentBackground)
+                        self?.signUpView.emailAuthorizationButton.isEnabled = false
+                        self?.signUpView.emailAuthorizationButton.setTitleColor(.darkGray, for: .normal)
+                        self?.signUpView.emailAuthorizationButton.backgroundColor = UIColor(color: .placeholder)
                     } else {
                         self?.showAlertDialog(title: "경고", message: "인증번호가 일치하지 않습니다.")
-                        self?.emailTextField.isEnabled = true
+                        self?.signUpView.emailTextField.isEnabled = true
                         self?.isEmailChecked = false
-                        self?.linkButton.isEnabled = true
+                        self?.signUpView.linkButton.isEnabled = true
                     }
                 }
             }
@@ -725,13 +381,13 @@ private extension SignUpViewController {
     }
     
     @objc func eyeClickButton() {
-        passwordTextField.isSecureTextEntry.toggle()
-        eyeButton.isSelected.toggle()
+        signUpView.passwordTextField.isSecureTextEntry.toggle()
+        signUpView.eyeButton.isSelected.toggle()
     }
     
     @objc func confirmEyeClickButton() {
-        passwordConfirmTextField.isSecureTextEntry.toggle()
-        confirmEyeButton.isSelected.toggle()
+        signUpView.passwordConfirmTextField.isSecureTextEntry.toggle()
+        signUpView.confirmEyeButton.isSelected.toggle()
     }
     
     @objc func clickBackButton() {
@@ -741,7 +397,7 @@ private extension SignUpViewController {
     @objc func clickLinkButton() {
         isButtonClicked = true
         print("중복 확인 버튼이 클릭되었습니다")
-        guard let email = emailTextField.text, !email.isEmpty else {
+        guard let email = signUpView.emailTextField.text, !email.isEmpty else {
             showAlertDialog(title: "경고", message: "이메일을 입력해주세요.")
             return
         }
@@ -803,11 +459,11 @@ extension SignUpViewController: UITextFieldDelegate {
     func textFieldDidChangeSelection(_ textField: UITextField) {
         let currentText = textField.text ?? ""
         
-        if textField == passwordTextField {
+        if textField == signUpView.passwordTextField {
             // passwordTextField의 유효성 검사
-            passwordErrorLabel.isHidden = currentText.isValidPassword()
+            signUpView.passwordErrorLabel.isHidden = currentText.isValidPassword()
             validatePasswordConfirm()
-        } else if textField == passwordConfirmTextField {
+        } else if textField == signUpView.passwordConfirmTextField {
             validatePasswordConfirm()
         }
     }
@@ -818,47 +474,22 @@ extension SignUpViewController: UITextFieldDelegate {
     }
 
     private func validatePasswordConfirm() {
-        let passwordText = passwordTextField.text ?? ""
-        let passwordConfirmText = passwordConfirmTextField.text ?? ""
+        let passwordText = signUpView.passwordTextField.text ?? ""
+        let passwordConfirmText = signUpView.passwordConfirmTextField.text ?? ""
 
         if passwordText == passwordConfirmText {
-            passwordConfirmErrorLabel.isHidden = false
-            passwordConfirmErrorLabel.textColor = .green
-            passwordConfirmErrorLabel.text = "비밀번호가 일치합니다."
+            signUpView.passwordConfirmErrorLabel.isHidden = false
+            signUpView.passwordConfirmErrorLabel.textColor = .green
+            signUpView.passwordConfirmErrorLabel.text = "비밀번호가 일치합니다."
         } else if !passwordConfirmText.isEmpty {
-            passwordConfirmErrorLabel.textColor = .red
-            passwordConfirmErrorLabel.isHidden = false
-            passwordConfirmErrorLabel.text = "비밀번호가 일치하지 않습니다."
+            signUpView.passwordConfirmErrorLabel.textColor = .red
+            signUpView.passwordConfirmErrorLabel.isHidden = false
+            signUpView.passwordConfirmErrorLabel.text = "비밀번호가 일치하지 않습니다."
         }
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
-    }
-
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-//        if textField == emailTextField {
-//            view.frame.origin.y = 0
-//
-//        } else if textField == passwordTextField || textField == passwordConfirmTextField || textField == authenticationNumberTextField {
-//            // 부드러운 효과를 위해 애니메이션 처리
-//            UIView.animate(withDuration: 0.3) {
-//                let transform = CGAffineTransform(translationX: 0, y: -100)
-//                self.view.transform = transform
-//            }
-//        }
-    }
-       
-    func textFieldDidEndEditing(_ textField: UITextField) {
-//        if textField == emailTextField {
-//            view.frame.origin.y = 0
-//
-//        } else if textField == passwordTextField {
-//            UIView.animate(withDuration: 0.3) {
-//                let transform = CGAffineTransform(translationX: 0, y: 0)
-//                self.view.transform = transform
-//            }
-//        }
     }
 }
 

@@ -115,6 +115,7 @@
 		7FDFF2142AFB819B0036B1E0 /* TOCropViewController in Frameworks */ = {isa = PBXBuildFile; productRef = 7FDFF2132AFB819B0036B1E0 /* TOCropViewController */; };
 		E73D73DC2AD7D14000EF9554 /* Tabman in Frameworks */ = {isa = PBXBuildFile; productRef = E73D73DB2AD7D14000EF9554 /* Tabman */; };
 		E7496E622AFDC45700AC5CE9 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7496E612AFDC45700AC5CE9 /* SignUpView.swift */; };
+		E7496E642AFDCBF200AC5CE9 /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7496E632AFDCBF200AC5CE9 /* SignUp.swift */; };
 		E7C7D25A2AEFEBC500636732 /* SwiftSMTP in Frameworks */ = {isa = PBXBuildFile; productRef = E7C7D2592AEFEBC500636732 /* SwiftSMTP */; };
 /* End PBXBuildFile section */
 
@@ -214,6 +215,7 @@
 		E73D73DD2AD7DEA200EF9554 /* NoticeMeetingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeMeetingController.swift; sourceTree = "<group>"; };
 		E73D73DF2AD7E5FA00EF9554 /* NoticeHomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeHomeController.swift; sourceTree = "<group>"; };
 		E7496E612AFDC45700AC5CE9 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		E7496E632AFDCBF200AC5CE9 /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		E74C58E82AD65E1100C2DEF5 /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
 		E74C58EE2AD6B1B300C2DEF5 /* MeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingViewController.swift; sourceTree = "<group>"; };
 		E76A3FC72AE6159A005751AD /* CategoryCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionCell.swift; sourceTree = "<group>"; };
@@ -502,6 +504,7 @@
 				7FA613F42AE9280C00735891 /* MeetingsData.swift */,
 				18C65F392AEAB33D006A3A79 /* MyUserInfo.swift */,
 				102C6E292AFAB0FE008BBB37 /* NoticeBoardImagePath.swift */,
+				E7496E632AFDCBF200AC5CE9 /* SignUp.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -741,6 +744,7 @@
 				7B226F032AEBD85900EAED75 /* NoticeBoardDetailView.swift in Sources */,
 				7B226F042AEBD85900EAED75 /* WriterStackView.swift in Sources */,
 				7B226F052AEBD85900EAED75 /* NoticeBoardDetailViewController.swift in Sources */,
+				E7496E642AFDCBF200AC5CE9 /* SignUp.swift in Sources */,
 				7B226F062AEBD85900EAED75 /* CommentUpdateViewController.swift in Sources */,
 				7B226F072AEBD85900EAED75 /* FirebaseCommentManager.swift in Sources */,
 				7B226F082AEBD85900EAED75 /* NoticeViewController.swift in Sources */,

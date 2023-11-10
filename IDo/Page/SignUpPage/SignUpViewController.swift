@@ -22,7 +22,6 @@ final class SignUpViewController: UIViewController {
     var isEmailChecked: Bool = false
     var isButtonClicked: Bool = false
     var isPrivacyPolicy: Bool = false
-    
     override func loadView() {
         view = signUpView
     }
@@ -62,7 +61,6 @@ private extension SignUpViewController {
         view.backgroundColor = .white
         setupButton()
         setupKeyboardEvent()
-        setupHyperLink()
         signUpView.emailTextField.delegate = self
         signUpView.authenticationNumberTextField.delegate = self
         signUpView.passwordTextField.delegate = self
@@ -82,44 +80,6 @@ private extension SignUpViewController {
         signUpView.emailTextField.addTarget(self, action: #selector(emailTextFieldDidChange(_:)), for: .editingChanged)
     }
 
-    func setupHyperLink() {
-        guard let termsText = signUpView.termsLabel.text else { return }
-        let termsAttributedString = NSMutableAttributedString(string: termsText)
-        let termsRange = (termsText as NSString).range(of: "이용약관")
-        let termsLinkAttributes: [NSAttributedString.Key: Any] = [
-            .link: URL(string: "https://melon-drawer-23e.notion.site/43d5209ed002411998698f51554c074a?pvs=4")!, // 링크 URL
-            .foregroundColor: UIColor.blue, // 링크 텍스트 색상
-            .underlineStyle: NSUnderlineStyle.single.rawValue // 밑줄 스타일
-        ]
-
-        termsAttributedString.addAttributes(termsLinkAttributes, range: termsRange)
-
-        // UILabel에 NSAttributedString 설정
-        signUpView.termsLabel.attributedText = termsAttributedString
-
-        // UILabel의 텍스트 선택 가능하게 설정
-        signUpView.termsLabel.isUserInteractionEnabled = true
-        signUpView.termsLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(termsOfUseTap)))
-        
-        guard let privacyPolicyText = signUpView.privacyPolicyLabel.text else { return }
-        let privacyPolicyAttributedString = NSMutableAttributedString(string: privacyPolicyText)
-        let privacyPolicyRange = (privacyPolicyText as NSString).range(of: "개인정보처리방침")
-        let privacyPolicyLinkAttributes: [NSAttributedString.Key: Any] = [
-            .link: URL(string: "https://melon-drawer-23e.notion.site/43d5209ed002411998698f51554c074a?pvs=4")!, // 링크 URL
-            .foregroundColor: UIColor.blue, // 링크 텍스트 색상
-            .underlineStyle: NSUnderlineStyle.single.rawValue // 밑줄 스타일
-        ]
-
-        privacyPolicyAttributedString.addAttributes(privacyPolicyLinkAttributes, range: privacyPolicyRange)
-
-        // UILabel에 NSAttributedString 설정
-        signUpView.privacyPolicyLabel.attributedText = privacyPolicyAttributedString
-
-        // UILabel의 텍스트 선택 가능하게 설정
-        signUpView.privacyPolicyLabel.isUserInteractionEnabled = true
-        signUpView.privacyPolicyLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(privacyPolicyLabelTap)))
-    }
-    
     @objc func clickNextButton() {
         signUpView.nextButton.isEnabled = false
         defer {
@@ -201,18 +161,6 @@ private extension SignUpViewController {
         let password = signUpView.passwordTextField.text!
         let categoryVC = CategorySelectViewController(email: email, password: password)
         navigationController?.pushViewController(categoryVC, animated: true)
-    }
-
-    @objc func termsOfUseTap() {
-        if let url = URL(string: "https://melon-drawer-23e.notion.site/43d5209ed002411998698f51554c074a?pvs=4") {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
-    }
-    
-    @objc func privacyPolicyLabelTap() {
-        if let url = URL(string: "https://melon-drawer-23e.notion.site/08b7900683944a66956bc8be87ba833b?pvs=4") {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
     }
     
     func isValidEmail(_ email: String) -> Bool {

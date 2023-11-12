@@ -441,12 +441,12 @@ extension CreateNoticeBoardViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: (collectionView.bounds.width - 8) / 5, height: (collectionView.bounds.width - 8) / 5)
     }
     
-    // 수평
+    // 수평 간격
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 2
     }
     
-    // 수직
+    // 수직 간격
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 2
     }

@@ -12,6 +12,15 @@ import UIKit
 class CategoryCollectionCell: UICollectionViewCell {
     static let identifier = "CategoryCollectionViewCell"
 
+    private(set) lazy var categoryStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .fillProportionally
+        stackView.spacing = 10
+        return stackView
+    }()
+    
     let categoryImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -37,20 +46,26 @@ class CategoryCollectionCell: UICollectionViewCell {
     }
 
     func setupViews() {
-        addSubview(categoryImageView)
-        addSubview(label)
+        contentView.addSubview(categoryStackView)
+        categoryStackView.addArrangedSubview(categoryImageView)
+        categoryStackView.addArrangedSubview(label)
 
-        categoryImageView.contentMode = .scaleAspectFit
-        categoryImageView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
+        categoryStackView.snp.makeConstraints { make in
+            make.top.equalTo(contentView.snp.top).offset(8)
+            make.leading.equalTo(contentView.snp.leading)
+            make.trailing.equalTo(contentView.snp.trailing)
+            make.bottom.equalTo(contentView.snp.bottom).offset(-8)
             make.centerX.equalToSuperview()
+        }
+        
+        categoryImageView.snp.makeConstraints { make in
             make.height.width.equalTo(80)
         }
 
-        label.textAlignment = .center
-        label.snp.makeConstraints { make in
-            make.top.equalTo(categoryImageView.snp.bottom).offset(20)
-            make.leading.trailing.equalToSuperview().inset(10)
-        }
+//        label.snp.makeConstraints { make in
+//            make.top.equalTo(categoryImageView.snp.bottom).offset(20)
+//            make.leading.trailing.equalToSuperview().inset(20)
+//            make.bottom.equalTo(contentView.snp.bottom).offset(-10)
+//        }
     }
 }

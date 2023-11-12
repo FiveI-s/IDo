@@ -45,7 +45,7 @@ class SignUpProfileViewController: UIViewController {
     // 닉네임 글자 수 표시 label
     private(set) lazy var nickNameCountLabel: UILabel = {
         var label = UILabel()
-        label.text = "(0/10)"
+        label.text = "(0/6)"
         label.textColor = UIColor(color: .placeholder)
         label.font = UIFont.bodyFont(.small, weight: .regular)
         return label
@@ -258,12 +258,10 @@ private extension SignUpProfileViewController {
         signUpButton.isEnabled = false
 
         guard !nickNameTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, nickNameTextView.textColor == UIColor.black else {
-//            showAlert(message: "닉네임을 입력해주세요")
             AlertManager.showAlert(on: self, title: "알림", message: "닉네임을 입력해주세요.")
             return
         }
         guard !descriptionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, descriptionTextView.textColor == UIColor.black else {
-//            showAlert(message: "자기소개를 입력해주세요")
             AlertManager.showAlert(on: self, title: "알림", message: "자기소개를 입력해주세요.")
             return
         }
@@ -273,8 +271,7 @@ private extension SignUpProfileViewController {
 
             self.signUpButton.isEnabled = true
 
-            if let error {
-//                self.showAlert(message: "로그인에 실패하였습니다.")
+            if error != nil {
                 AlertManager.showAlert(on: self, title: "알림", message: "로그인에 실패하였습니다.")
                 return
             }
@@ -288,15 +285,6 @@ private extension SignUpProfileViewController {
             self.firebaseLogin()
         }
     }
-
-//    func showAlert(message: String) {
-//        DispatchQueue.main.async {
-//            let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-//            let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
-//            alert.addAction(okAction)
-//            self.present(alert, animated: true, completion: nil)
-//        }
-//    }
 
     func firebaseLogin() {
         Auth.auth().signIn(withEmail: email, password: password) { authData, error in
@@ -355,7 +343,7 @@ extension SignUpProfileViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         if textView == nickNameTextView {
             let textCount = textView.text.count
-            nickNameCountLabel.text = "(\(textCount)/10)"
+            nickNameCountLabel.text = "(\(textCount)/6)"
 
             if textCount == 0 {
                 nickNameCountLabel.textColor = UIColor(color: .placeholder)
@@ -400,7 +388,7 @@ extension SignUpProfileViewController: UITextViewDelegate {
                 descriptionTextView.becomeFirstResponder()
                 return false
             }
-            if changedText.count > 10 {
+            if changedText.count > 6 {
                 nickNameCountLabel.textColor = UIColor.red
                 shakeAnimation(for: nickNameCountLabel)
                 return false
@@ -418,28 +406,6 @@ extension SignUpProfileViewController: UITextViewDelegate {
         }
         return true
     }
-
-//    func textViewDidChange(_ textView: UITextView) {
-//        aboutUsLabel.isHidden = !textView.text.isEmpty
-//        countDescriptionLabel.text = "\(textView.text.count)/300"
-//
-//        if textView.text.count >= 300 {
-//            shakeAnimation(for: countDescriptionLabel)
-//            countDescriptionLabel.textColor = .red
-//        } else {
-//            countDescriptionLabel.textColor = .black
-//        }
-//    }
-//
-//    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-//        let currentText = textView.text ?? ""
-//        let prospectiveText = (currentText as NSString).replacingCharacters(in: range, with: text)
-//
-//        if prospectiveText.count > 300 {
-//            return false
-//        }
-//        return true
-//    }
 }
 
 // MARK: - 이미지 피커 관련

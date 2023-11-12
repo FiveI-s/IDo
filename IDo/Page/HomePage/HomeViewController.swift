@@ -50,7 +50,10 @@ class HomeViewController : UIViewController {
         line2.backgroundColor = UIColor(color: .placeholder)
     }
     func makeJoinClub() {
-        joinClub.text = "가입한 모임"
+        DispatchQueue.main.async {
+            guard let nickName = MyProfile.shared.myUserInfo?.nickName else { return }
+            self.joinClub.text = "\(nickName)님이 가입하신 모임"
+        }
         joinClub.textColor = UIColor(color: .textStrong)
         joinClub.font = .bodyFont(.large, weight: .bold)
     }
@@ -81,6 +84,7 @@ class HomeViewController : UIViewController {
         super.viewWillAppear(animated)
 //        getUserClubList(userID: MyProfile.shared.myUserInfo!.id)
         updateUIBasedOnData()
+        self.makeJoinClub()
         joinClubTableView.reloadData()
     }
     

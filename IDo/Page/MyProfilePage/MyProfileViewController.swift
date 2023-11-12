@@ -55,8 +55,9 @@ class MyProfileViewController: UIViewController {
     func makeProfileName() {
         profileName.text = ""
         profileName.textAlignment = .center
-        profileName.textColor = .black
+        profileName.textColor = UIColor(named: "ui-text-strong")
         profileName.font = UIFont.headFont(.xSmall, weight: .medium)
+        profileName.layer.cornerRadius = 10
         profileName.isUserInteractionEnabled = false
     }
         
@@ -358,6 +359,10 @@ extension MyProfileViewController: UITextViewDelegate {
             
         let chagedText = currentText.replacingCharacters(in: stringRange, with: text)
             
+        if textView == profileName {
+            return chagedText.count <= 6
+        }
+        
         if textView === selfInfoDetail {
             return chagedText.count <= 300
         }
@@ -411,7 +416,7 @@ extension MyProfileViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-// 네이게이션 바
+// MARK: - 네비게이션 바
 private extension MyProfileViewController {
     func profileEditControllerSet() {
         // 네비게이션 LargeTitle 비활성화 및 title 입력
@@ -431,16 +436,26 @@ private extension MyProfileViewController {
         NavigationBar.setNavigationBackButton(for: navigationItem, title: "")
     }
     
+    // 취소 버튼을 숨기고 문구를 표시
     private func hiddenLeftButton() {
-        navigationItem.leftBarButtonItem?.tintColor = .clear
-        navigationItem.leftBarButtonItem?.isEnabled = false
+        navigationItem.leftBarButtonItem = nil
+        if let navigationBar = navigationController?.navigationBar {
+            NavigationBar.setNavigationTitle(for: navigationItem, in: navigationBar, title: "")
+        }
+        showLeftLabel()
     }
     
+    // 취소 버튼을 보이고, 타이틀에 프로필 편집 문구를 표시
     private func unHiddenLeftButton() {
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(profileUpdateCancle))
         navigationItem.leftBarButtonItem?.tintColor = UIColor(color: .negative)
+        if let navigationBar = navigationController?.navigationBar {
+            NavigationBar.setNavigationTitle(for: navigationItem, in: navigationBar, title: "프로필 편집")
+        }
         navigationItem.leftBarButtonItem?.isEnabled = true
     }
     
+    // 취소 버튼을 눌렀을 때
     @objc func profileUpdateCancle() {
         isEdit.toggle()
         
@@ -452,41 +467,55 @@ private extension MyProfileViewController {
         hiddenLeftButton()
         
         navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
+        
         profileName.isUserInteractionEnabled = false
+        profileName.backgroundColor = .clear
         profileName.text = myProfile.nickName
+        
         selfInfoDetail.isUserInteractionEnabled = false
         selfInfoDetail.text = myProfile.description
+        
         selfInfoInt.text = "(\(myProfile.description?.count ?? 0)/300)"
         selfInfoInt.textColor = UIColor(color: .placeholder)
+        
         choiceEnjoyTextField.isUserInteractionEnabled = false
         choiceEnjoyTextField.text = myProfile.hobbyList?.first
-
-        writeMe.isHidden = false // 작성한글 title Label 나타내기
-        writeMeTableView.isHidden = false // 작성한글 리스트 나타내기
+        
+        // 작성한글 title Label 나타내기
+        writeMe.isHidden = false
+        
+        // 작성한글 리스트 나타내기
+        writeMeTableView.isHidden = false
         logout.isHidden = false
         line.isHidden = false
         deleteID.isHidden = false
         profileImage.isUserInteractionEnabled = false
+        
         if let data = myProfile.profileImage[ImageSize.medium.rawValue],
            let image = UIImage(data: data) {
             profileImage.setImage(image, for: .normal)
         } else {
             profileImage.setImage(UIImage(named: "profile"), for: .normal)
         }
+        
         choiceEnjoyTextField.tintColor = .clear
     }
-
+    
+    // 수정 버튼을 눌렀을 때
     @objc func editVC() {
         // 기본 isEdit은 false. toggle(전등스위치개념) 사용하여 true(수정중인 상태)로 바꿔줌
         isEdit.toggle()
                 
         // isEdit = true인 상태의 실행 코드
         if isEdit {
-            navigationItem.rightBarButtonItem?.image = UIImage(systemName: "checkmark.circle")
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(editVC))
+            navigationItem.rightBarButtonItem?.tintColor = UIColor(color: .main)
+            
             unHiddenLeftButton()
             
             // 각각 텍스트뷰를 활성화 시킴
             profileName.isUserInteractionEnabled = true
+            profileName.backgroundColor = UIColor(color: .backgroundSecondary)
             selfInfoDetail.isUserInteractionEnabled = true
             selfInfoInt.textColor = UIColor(color: .textStrong)
             choiceEnjoyTextField.isUserInteractionEnabled = true
@@ -498,30 +527,53 @@ private extension MyProfileViewController {
             deleteID.isHidden = true
             profileImage.isUserInteractionEnabled = true
             choiceEnjoyTextField.tintColor = .clear
-
+            
+            
             // isEdit = false인 상태의 실행 코드
         } else {
-            navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
-            hiddenLeftButton()
-            
-            profileName.isUserInteractionEnabled = false
-            selfInfoDetail.isUserInteractionEnabled = false
-            selfInfoInt.textColor = UIColor(color: .placeholder)
-            choiceEnjoyTextField.isUserInteractionEnabled = false
-            
-            writeMe.isHidden = false // 작성한글 title Label 나타내기
-            writeMeTableView.isHidden = false // 작성한글 리스트 나타내기
-            logout.isHidden = false
-            line.isHidden = false
-            deleteID.isHidden = false
-            profileImage.isUserInteractionEnabled = false
-            choiceEnjoyTextField.tintColor = .clear
-            guard let hobby = choiceEnjoyTextField.text else {
-                print("관심사가 업습니다.")
-                return
+            if profileName.text.count == 0 {
+                AlertManager.showAlert(on: self, title: "알림", message: "닉네임을 입력하세요.")
+                isEdit = true
             }
-            MyProfile.shared.update(nickName: profileName.text, updateProfileImage: profileImage.image(for: .normal), description: selfInfoDetail.text, hobbyList: [hobby])
+            else {
+                navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
+                hiddenLeftButton()
+                
+                profileName.isUserInteractionEnabled = false
+                profileName.backgroundColor = .clear
+                selfInfoDetail.isUserInteractionEnabled = false
+                selfInfoInt.textColor = UIColor(color: .placeholder)
+                choiceEnjoyTextField.isUserInteractionEnabled = false
+                
+                writeMe.isHidden = false // 작성한글 title Label 나타내기
+                writeMeTableView.isHidden = false // 작성한글 리스트 나타내기
+                logout.isHidden = false
+                line.isHidden = false
+                deleteID.isHidden = false
+                profileImage.isUserInteractionEnabled = false
+                choiceEnjoyTextField.tintColor = .clear
+                guard let hobby = choiceEnjoyTextField.text else {
+                    print("관심사가 업습니다.")
+                    return
+                }
+                MyProfile.shared.update(nickName: profileName.text, updateProfileImage: profileImage.image(for: .normal), description: selfInfoDetail.text, hobbyList: [hobby])
+            }
         }
+    }
+    
+    private func showLeftLabel() {
+        let label = UILabel()
+        label.text = "i들아 모여라" // 원하는 문구로 대체
+        label.font = UIFont.headFont(.xSmall , weight: .bold)
+        label.textColor = UIColor(color: .borderSelected)
+        let containerView = UIView()
+        containerView.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(7) // 또는 적절한 값을 사용
+            make.top.bottom.trailing.equalToSuperview()
+        }
+        
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: containerView)
     }
 }
 

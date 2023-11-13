@@ -84,9 +84,9 @@ extension UIImage {
     
     
         func resizedAndRoundedImage() -> UIImage? {
-            var imageWidth = UIScreen.main.bounds.width-40
+            let imageWidth = UIScreen.main.bounds.width-40
             let desiredAspectRatio: CGFloat = 3.0 / 4.0
-            var imageHeight = imageWidth * desiredAspectRatio
+            let imageHeight = imageWidth * desiredAspectRatio
             
             let targetSize = CGSize(width: imageWidth, height: imageHeight)
             let cornerRadius: CGFloat = 24.0

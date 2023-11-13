@@ -51,7 +51,6 @@ class MeetingManageViewController: UIViewController {
         if let navigationBar = navigationController?.navigationBar {
             NavigationBar.setNavigationTitle(for: navigationItem, in: navigationBar, title: "모임 수정하기")
         }
-//        placeholderLabel.isHidden = !meetingDescriptionField.text.isEmpty
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -103,14 +102,6 @@ class MeetingManageViewController: UIViewController {
         return button
     }()
     
-//    let meetingNameField: UITextField = {
-//        let textField = UITextField()
-//        textField.font = UIFont(name: "SF Pro", size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .regular)
-//        textField.borderStyle = .roundedRect
-//        textField.backgroundColor = UIColor(named: "BackgroundSecondary")
-//        textField.placeholder = "모임 이름을 설정하세요."
-//        return textField
-//    }()
     
     // 이름을 작성하는 textView
     let meetingNameTextView: UITextView = {
@@ -154,16 +145,8 @@ class MeetingManageViewController: UIViewController {
         return label
     }()
     
-//    let placeholderLabel: UILabel = {
-//        let label = UILabel()
-//        label.text = "모임에 대한 소개를 해주세요."
-//        label.font = UIFont(name: "SF Pro", size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .regular)
-//        label.textColor = UIColor.placeholderText
-//        return label
-//    }()
-    
-    // 수정 버튼
     private let manageFinishButton = FinishButton(title: "수정 완료")
+    
     
     // MARK: - 키보드 관련
 
@@ -193,7 +176,6 @@ class MeetingManageViewController: UIViewController {
     // MARK: - UI 및 오토레이아웃 설정
 
     private func configureUI() {
-        // UI 설정
         view.backgroundColor = UIColor(color: .backgroundPrimary)
         view.addSubview(scrollView)
         meetingNameTextView.delegate = self
@@ -289,8 +271,7 @@ class MeetingManageViewController: UIViewController {
 
             return
         }
-        
-//        saveMeetingToFirebase(name: name, description: description, imageData: imageData)
+
         saveResizeImageMeetingToFirebase(name: name, description: description, clubImage: meetingImage, imageData: imageData)
     }
     
@@ -320,33 +301,6 @@ class MeetingManageViewController: UIViewController {
             }
         }
     }
-    
-//    private func saveMeetingToFirebase(name: String, description: String, imageData: Data) {
-//        club.title = name
-//        club.description = description
-//        meetingsData.updateClub(club: club, imagaData: imageData) { isSuccess in
-//            if isSuccess {
-//                print("데이터 수정 성공")
-//
-//                let alert = UIAlertController(title: "완료", message: "모임 정보가 수정되었습니다.", preferredStyle: .alert)
-//                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
-//                    self.navigationController?.popViewController(animated: true)
-//                }))
-//                var clubList = MyProfile.shared.myUserInfo?.myClubList ?? []
-//                if let clubIndex = MyProfile.shared.myUserInfo?.myClubList?.firstIndex(where: {$0.id == self.club.id}) {
-//                    clubList[clubIndex] = self.club
-//                    MyProfile.shared.update(myClubList: clubList)
-//                }
-//
-//                self.updateHandler?(self.club, imageData)
-//                self.present(alert, animated: true, completion: nil)
-//            } else {
-//                self.manageFinishButton.isEnabled = true
-//
-//                print("데아터 수정 실패")
-//            }
-//        }
-//    }
 }
 
 // MARK: - 이미지 편집 관련
@@ -481,26 +435,4 @@ extension MeetingManageViewController: UITextViewDelegate {
         }
         return true
     }
-    
-//    func textViewDidChange(_ textView: UITextView) {
-//        placeholderLabel.isHidden = !textView.text.isEmpty
-//        countDescriptionField.text = "\(textView.text.count)/300"
-//
-//        if textView.text.count > 300 {
-//            shakeAnimation(for: countDescriptionField)
-//            countDescriptionField.textColor = .red
-//        } else {
-//            countDescriptionField.textColor = .black
-//        }
-//    }
-//
-//    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-//        let currentText = textView.text ?? ""
-//        let prospectiveText = (currentText as NSString).replacingCharacters(in: range, with: text)
-//
-//        if prospectiveText.count > 301 {
-//            return false
-//        }
-//        return true
-//    }
 }

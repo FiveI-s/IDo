@@ -2,7 +2,6 @@ import FirebaseDatabase
 import FirebaseStorage
 import UIKit
 import TOCropViewController
-//import CropViewController
 
 class MeetingCreateViewController: UIViewController {
     init(meetingsData: MeetingsData) {
@@ -32,6 +31,7 @@ class MeetingCreateViewController: UIViewController {
         return button
     }()
     
+    // 모임 이름 작성란
     let meetingNameTextView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = UIColor(color: .backgroundSecondary)
@@ -416,32 +416,7 @@ extension MeetingCreateViewController: UITextViewDelegate {
     }
 }
 
-extension MeetingCreateViewController: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard textField == meetingNameTextView else {
-            return true
-        }
-        
-        func textFieldDidChangeSelection(_ textField: UITextField) {
-            updateFinishButtonState()
-        }
-        
-        let currentText = textField.text ?? ""
-        let prospectiveText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        
-        countMeetingNameLabel.text = "\(prospectiveText.count)/20"
-        
-        if prospectiveText.count > 20 {
-            shakeAnimation(for: countMeetingNameLabel)
-            countMeetingNameLabel.textColor = .red
-            return false
-        } else {
-            countMeetingNameLabel.textColor = .black
-        }
-        
-        return true
-    }
-}
+
 
 // 키보드 올라왔을 때 화면 터치시 키보드 내리는 로직을 uiviewcontroller 에 대해 익스텐션으로 추가해서
 // hideKeyboardWhenTappedAround() 만 추가하면 모든 뷰컨트롤러에서 적용

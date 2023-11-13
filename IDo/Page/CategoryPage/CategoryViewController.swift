@@ -57,7 +57,7 @@ class CategoryViewController: UIViewController {
             make.height.equalTo(1)
         }
         selectCategoryCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(line.snp.bottom)
+            make.top.equalTo(line.snp.bottom).offset(16)
             make.left.right.equalTo(view.safeAreaLayoutGuide)
             make.height.equalTo(480)
         }

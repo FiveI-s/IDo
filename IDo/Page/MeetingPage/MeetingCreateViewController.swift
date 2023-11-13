@@ -76,9 +76,6 @@ class MeetingCreateViewController: UIViewController {
     private let createFinishButton = FinishButton()
 
     @objc private func createMeeting() {
-//            guard let name = meetingNameField.text, !name.isEmpty,
-//        guard let name = meetingNameTextView.text, !name.isEmpty,
-//              let description = meetingDescriptionTextView.text, !description.isEmpty else {
         createFinishButton.isEnabled = false
 
         if meetingNameTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || meetingNameTextView.textColor == UIColor(color: .placeholder) || meetingDescriptionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || meetingDescriptionTextView.textColor == UIColor(color: .placeholder) {
@@ -113,22 +110,7 @@ class MeetingCreateViewController: UIViewController {
         }
 
         let club = Club(id: UUID().uuidString, rootUser: currentUserSummary, title: meetingNameTextView.text, imageURL: nil, description: meetingDescriptionTextView.text, category: meetingsData.category, userList: [currentUserSummary], createDate: Date().dateToString)
-          
-//        meetingsData.addClub(club: club, imageData: imageData) { isSuccess in
-//            if isSuccess {
-//                let alert = UIAlertController(title: "완료", message: "모임을 개설했습니다!", preferredStyle: .alert)
-//                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
-//                    self.navigationController?.popViewController(animated: true)
-//                }))
-//                self.present(alert, animated: true, completion: nil)
-//            } else {
-//                let alert = UIAlertController(title: "실패", message: "모임을 개설하지 못했습니다.", preferredStyle: .alert)
-//                alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
-//                    self.navigationController?.popViewController(animated: true)
-//                }))
-//                self.createFinishButton.isEnabled = true
-//            }
-//        }
+
         if let image = profileImageButton.image(for: .normal) {
             clubImage = image
         }
@@ -210,10 +192,6 @@ class MeetingCreateViewController: UIViewController {
     // MARK: - UI 설정 및 오토레이아웃
 
     private func configureUI() {
-        // UI 설정
-//        meetingNameField.delegate = self
-//        containerView.addSubview(meetingNameField)
-//        containerView.addSubview(placeholderLabel)
         view.backgroundColor = UIColor(color: .backgroundPrimary)
         view.addSubview(scrollView)
         
@@ -336,16 +314,6 @@ extension MeetingCreateViewController: TOCropViewControllerDelegate {
 }
 
 
-//extension MeetingCreateViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-//        if let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-////                let roundedImage = selectedImage.resizedAndRoundedImage()
-//            profileImageButton.setImage(selectedImage, for: .normal)
-//            profileImageButton.profileImageChanged = true
-//        }
-//        picker.dismiss(animated: true, completion: nil)
-//    }
-//}
 
 // MARK: - 텍스트 뷰 관련
 
@@ -408,7 +376,7 @@ extension MeetingCreateViewController: UITextViewDelegate {
         }
     }
     
-    // 입력 종료 시 호출
+    // MARK: 입력 종료 시 호출
     func textViewDidEndEditing(_ textView: UITextView) {
         if meetingNameTextView.text.isEmpty {
             meetingNameTextView.text = "모임 이름을 입력해주세요."
@@ -446,29 +414,6 @@ extension MeetingCreateViewController: UITextViewDelegate {
         }
         return true
     }
-    
-//    func textViewDidChange(_ textView: UITextView) {
-    ////        placeholderLabel.isHidden = !textView.text.isEmpty
-//        countDescriptionTextView.text = "\(textView.text.count)/300"
-//        updateFinishButtonState()
-//
-//        if textView.text.count > 300 {
-//            shakeAnimation(for: countDescriptionTextView)
-//            countDescriptionTextView.textColor = .red
-//        } else {
-//            countDescriptionTextView.textColor = .black
-//        }
-//    }
-//
-//    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-//        let currentText = textView.text ?? ""
-//        let prospectiveText = (currentText as NSString).replacingCharacters(in: range, with: text)
-//
-//        if prospectiveText.count > 301 {
-//            return false
-//        }
-//        return true
-//    }
 }
 
 extension MeetingCreateViewController: UITextFieldDelegate {
@@ -499,7 +444,7 @@ extension MeetingCreateViewController: UITextFieldDelegate {
 }
 
 // 키보드 올라왔을 때 화면 터치시 키보드 내리는 로직을 uiviewcontroller 에 대해 익스텐션으로 추가해서
-// self.hideKeyboardWhenTappedAround() 만 추가하면 모든 뷰컨트롤러에서 적용
+// hideKeyboardWhenTappedAround() 만 추가하면 모든 뷰컨트롤러에서 적용
 
 extension UIViewController {
     func hideKeyboardWhenTappedAround() {

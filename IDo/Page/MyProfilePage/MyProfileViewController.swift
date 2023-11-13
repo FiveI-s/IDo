@@ -320,8 +320,8 @@ class MyProfileViewController: UIViewController {
         line.snp.makeConstraints { make in
             make.centerY.equalTo(logout)
             make.centerX.equalTo(scrollView)
-            make.width.equalTo(2)
-            make.height.equalTo(18)
+            make.width.equalTo(1)
+            make.height.equalTo(12)
         }
         deleteID.snp.makeConstraints { make in
             make.centerY.equalTo(line)

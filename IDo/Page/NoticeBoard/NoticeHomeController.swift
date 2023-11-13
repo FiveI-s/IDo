@@ -260,11 +260,12 @@ extension NoticeHomeController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MemberTableViewCell.identifier, for: indexPath) as? MemberTableViewCell else { return UITableViewCell() }
         cell.selectionStyle = .none
-        if let userList = firebaseClubDatabaseManager.model?.userList {
+        if let userList = firebaseClubDatabaseManager.model?.userList, let rootUser = firebaseClubDatabaseManager.model?.rootUser {
             let user = userList[indexPath.row]
             cell.nameLabel.text = user.nickName
             cell.descriptionLabel.text = user.description
             cell.profileImageView.imageView.image = nil
+            cell.headImageView.isHidden = (user.id != rootUser.id)
             guard let profilePath = user.profileImagePath else {
                 if let defaultImage = UIImage(systemName: "person.fill") {
                     cell.setUserImage(profileImage: defaultImage, color: UIColor(color: .contentBackground))

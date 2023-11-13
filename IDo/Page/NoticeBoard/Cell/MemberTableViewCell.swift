@@ -35,6 +35,13 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
         return label
     }()
     
+    let headImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "star.fill")
+        imageView.tintColor = UIColor(color: .contentDisable)
+        return imageView
+    }()
+    
     var imageSize: CGFloat = 36
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -56,6 +63,7 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
         contentView.addSubview(profileImageView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(descriptionLabel)
+        contentView.addSubview(headImageView)
     }
     
     private func setupAutoLayout() {
@@ -73,6 +81,14 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
         descriptionLabel.snp.makeConstraints { make in
             make.bottom.equalTo(profileImageView.snp.bottom)
             make.left.equalTo(profileImageView.snp.right).offset(Constant.margin2)
+        }
+        headImageView.snp.makeConstraints { make in
+            make.centerY.equalTo(profileImageView)
+            make.right.equalTo(contentView.snp.right)
+            make.width.height.equalTo(imageSize/2)
+//            make.centerY.equalTo(nameLabel)
+//            make.left.equalTo(nameLabel.snp.right).offset(Constant.margin1)
+//            make.width.height.equalTo(imageSize/3)
         }
     }
     

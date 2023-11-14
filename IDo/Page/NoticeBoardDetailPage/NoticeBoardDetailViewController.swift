@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import FirebaseAuth
 import FirebaseDatabase
+import FirebaseStorage
 
 final class NoticeBoardDetailViewController: UIViewController {
     
@@ -33,6 +34,8 @@ final class NoticeBoardDetailViewController: UIViewController {
     weak var delegate: FirebaseManagerDelegate?
     
     private var editIndex: Int
+    let urlCache = FBURLCache.shared
+    let storage = Storage.storage().reference()
     
     init(noticeBoard: NoticeBoard, firebaseNoticeBoardManager: FirebaseManager, editIndex: Int) {
         self.noticeBoard = noticeBoard
@@ -142,6 +145,7 @@ private extension NoticeBoardDetailViewController {
         
     }
     
+    // MARK: - 게시판 사용자 정보 보여주기
     func updateNoticeBoardSetup() {
         if let dateString = noticeBoard.createDate.toDate?.diffrenceDate {
             noticeBoardDetailView.writerInfoView.writerTimeLabel.text = dateString
@@ -171,6 +175,43 @@ private extension NoticeBoardDetailViewController {
         }
     }
     
+    func presentToProfilePage() {
+        let profile = noticeBoard.rootUser
+        let profileViewController = MyProfileViewController()
+        profileViewController.userProfile = profile
+        
+        if let profileImageURL = profile.profileImagePath {
+            getUserImage(referencePath: profileImageURL, imageSize: .medium) { [weak profileViewController] downloadedImage in
+                DispatchQueue.main.async {
+                    if let image = downloadedImage {
+                        profileViewController?.profileImage.setImage(image, for: .normal)
+                    }
+                }
+            }
+        }
+        else {
+            
+            if let defaultImage = UIImage(named: "profile") {
+                profileViewController.profileImage.setImage(defaultImage, for: .normal)
+            }
+        }
+        
+        profileViewController.profileName.text = profile.nickName
+        profileViewController.choiceEnjoyTextField.text = profile.hobbyList?.first
+        profileViewController.selfInfoDetail.text = profile.description
+        
+        profileViewController.profileImage.isUserInteractionEnabled = true
+        profileViewController.profileName.isEditable = false
+        profileViewController.choicePickerView.isUserInteractionEnabled = false
+        profileViewController.selfInfoDetail.isEditable = false
+        profileViewController.logout.isHidden = true
+        profileViewController.line.isHidden = true
+        profileViewController.deleteID.isHidden = true
+        
+        self.present(profileViewController, animated: true, completion: nil)
+    
+    }
+    
     func noticeBoardSetup() {
 //        if let dateString = noticeBoard.createDate.toDate?.diffrenceDate {
 //            noticeBoardDetailView.writerInfoView.writerTimeLabel.text = dateString
@@ -188,7 +229,10 @@ private extension NoticeBoardDetailViewController {
 //                self.commentTableView.reloadSections(IndexSet(integer: 0), with: .none)
 //            }
 //        }
-        
+        noticeBoardDetailView.onImageTap = { [weak self] in
+            // 여기에서 MyProfileViewController로 넘어가는 로직을 구현합니다.
+            self?.presentToProfilePage()
+        }
         noticeBoardDetailView.writerInfoView.moreButtonTapHandler = { [weak self] in
             guard let self else { return }
             
@@ -487,6 +531,10 @@ extension NoticeBoardDetailViewController: UITableViewDelegate, UITableViewDataS
         }
         guard let dateText = comment.createDate.diffrenceDate else { return cell }
         cell.setDate(dateText: dateText)
+        
+        cell.onImageTap = { [weak self] in
+            self?.navigateToProfilePage(for: indexPath)
+        }
         return cell
     }
     
@@ -577,6 +625,55 @@ extension NoticeBoardDetailViewController: UITableViewDelegate, UITableViewDataS
         tableView.beginUpdates()
         tableView.deleteRows(at: [indexPath], with: .none)
         tableView.endUpdates()
+    }
+    func navigateToProfilePage(for indexPath: IndexPath) {
+        let profile = firebaseCommentManager.modelList[indexPath.row].writeUser
+        let profileViewController = MyProfileViewController()
+        profileViewController.userProfile = profile
+
+        // If the profile image path is not nil, fetch and set the image
+        if let profileImageURL = profile.profileImagePath {
+            firebaseCommentManager.getUserImage(referencePath: profileImageURL, imageSize: .medium) { [weak profileViewController] downloadedImage in
+                DispatchQueue.main.async {
+                    if let image = downloadedImage {
+                        profileViewController?.profileImage.setImage(image, for: .normal)
+                    }
+                }
+            }
+        } else {
+            // Set a default image if there is no profileImagePath
+            if let defaultImage = UIImage(named: "profile") {
+                profileViewController.profileImage.setImage(defaultImage, for: .normal)
+            }
+        }
+
+        profileViewController.profileName.text = profile.nickName
+        profileViewController.choiceEnjoyTextField.text = profile.hobbyList?.first
+        profileViewController.selfInfoDetail.text = profile.description
+        
+        profileViewController.profileImage.isUserInteractionEnabled = true
+        profileViewController.profileName.isEditable = false
+        profileViewController.choicePickerView.isUserInteractionEnabled = false
+        profileViewController.selfInfoDetail.isEditable = false
+        profileViewController.logout.isHidden = true
+        profileViewController.line.isHidden = true
+        profileViewController.deleteID.isHidden = true
+
+         // 전체 화면으로 모달을 표시하려면 이 줄을 추가하세요.
+        self.present(profileViewController, animated: true, completion: nil)
+    }
+    
+    func getUserImage(referencePath: String?, imageSize: ImageSize, completion: @escaping(UIImage?) -> Void) {
+        guard let referencePath else { return }
+        let imageRefPath = storage.child(referencePath).child(imageSize.rawValue).fullPath
+        self.urlCache.downloadURL(storagePath: imageRefPath) { result in
+            switch result {
+            case .success(let image):
+                completion(image)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
     
 }

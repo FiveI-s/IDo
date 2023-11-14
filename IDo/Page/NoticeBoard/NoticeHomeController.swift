@@ -7,6 +7,7 @@
 
 import FirebaseAuth
 import FirebaseDatabase
+import FirebaseStorage
 import SnapKit
 import UIKit
 
@@ -15,6 +16,10 @@ final class NoticeHomeController: UIViewController {
     private let firebaseClubDatabaseManager: FirebaseClubDatabaseManager
     private let clubImage: UIImage? = nil
     private let club: Club
+    
+    let urlCache = FBURLCache.shared
+    let storage = Storage.storage().reference()
+    
     let memberTableView: IntrinsicTableView = {
         let tableview = IntrinsicTableView()
         tableview.rowHeight = 36 + 8 + 8
@@ -260,30 +265,39 @@ extension NoticeHomeController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MemberTableViewCell.identifier, for: indexPath) as? MemberTableViewCell else { return UITableViewCell() }
         cell.selectionStyle = .none
+
         if let userList = firebaseClubDatabaseManager.model?.userList, let rootUser = firebaseClubDatabaseManager.model?.rootUser {
             let user = userList[indexPath.row]
             cell.nameLabel.text = user.nickName
             cell.descriptionLabel.text = user.description
             cell.profileImageView.imageView.image = nil
             cell.headImageView.isHidden = (user.id != rootUser.id)
-            guard let profilePath = user.profileImagePath else {
+
+            if let profilePath = user.profileImagePath {
+                FBURLCache.shared.downloadURL(storagePath: profilePath + "/\(ImageSize.small.rawValue)") { result in
+                    switch result {
+                    case .success(let image):
+                        DispatchQueue.main.async {
+                            cell.setUserImage(profileImage: image, color: UIColor(color: .white), margin: 0)
+                        }
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
+            } else {
                 if let defaultImage = UIImage(systemName: "person.fill") {
                     cell.setUserImage(profileImage: defaultImage, color: UIColor(color: .contentBackground))
                 }
-                return cell }
-            FBURLCache.shared.downloadURL(storagePath: profilePath + "/\(ImageSize.small.rawValue)") { result in
-                switch result {
-                case .success(let image):
-                    DispatchQueue.main.async {
-                        cell.setUserImage(profileImage: image, color: UIColor(color: .white), margin: 0)
-                    }
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
+            }
+
+            cell.onImageTap = { [weak self] in
+                self?.navigateToProfilePage(for: indexPath)
             }
         }
+
         return cell
     }
+
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard authState == .root,
@@ -301,5 +315,64 @@ extension NoticeHomeController: UITableViewDelegate, UITableViewDataSource {
         let config = UISwipeActionsConfiguration(actions: [removeAction])
         config.performsFirstActionWithFullSwipe = false
         return config
+    }
+    
+    func navigateToProfilePage(for indexPath: IndexPath) {
+        if let userList = firebaseClubDatabaseManager.model?.userList {
+            let profileViewController = MyProfileViewController()
+            let profile = userList[indexPath.row]
+            profileViewController.userProfile = profile
+
+            if let profileImageURL = profile.profileImagePath {
+//                FBURLCache.shared.downloadURL(storagePath: profileImageURL + "/\(ImageSize.small.rawValue)") { result in
+//                    switch result {
+//                    case .success(let image):
+//                        DispatchQueue.main.async {
+//                            profileViewController.profileImage.setImage(image, for: .normal)
+//                        }
+//                    case .failure(let error):
+//                        print(error.localizedDescription)
+//                    }
+//                }
+                getUserImage(referencePath: profileImageURL, imageSize: .medium) { [weak profileViewController] downloadedImage in
+                    DispatchQueue.main.async {
+                        if let image = downloadedImage {
+                            profileViewController?.profileImage.setImage(image, for: .normal)
+                        }
+                    }
+                }
+            }
+            else {
+                let defaultImage = UIImage(named: "profile") ?? UIImage(systemName: "person.fill")
+                profileViewController.profileImage.setImage(defaultImage, for: .normal)
+            }
+
+            profileViewController.profileName.text = profile.nickName
+            profileViewController.choiceEnjoyTextField.text = profile.hobbyList?.first
+            profileViewController.selfInfoDetail.text = profile.description
+            
+            profileViewController.profileImage.isUserInteractionEnabled = true
+            profileViewController.profileName.isEditable = false
+            profileViewController.choicePickerView.isUserInteractionEnabled = false
+            profileViewController.selfInfoDetail.isEditable = false
+            profileViewController.logout.isHidden = true
+            profileViewController.line.isHidden = true
+            profileViewController.deleteID.isHidden = true
+            
+            self.present(profileViewController, animated: true, completion: nil)
+        }
+    }
+    
+    func getUserImage(referencePath: String?, imageSize: ImageSize, completion: @escaping(UIImage?) -> Void) {
+        guard let referencePath else { return }
+        let imageRefPath = storage.child(referencePath).child(imageSize.rawValue).fullPath
+        self.urlCache.downloadURL(storagePath: imageRefPath) { result in
+            switch result {
+            case .success(let image):
+                completion(image)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

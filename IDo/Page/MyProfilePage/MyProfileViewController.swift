@@ -12,6 +12,7 @@ import UIKit
 class MyProfileViewController: UIViewController {
     private var firebaseManager: FBDatabaseManager<IDoUser>!
     private let scrollView: UIScrollView = UIScrollView()
+    var userProfile: UserSummary?
     
     // 프로필
     var profileImage = UIButton()
@@ -187,29 +188,36 @@ class MyProfileViewController: UIViewController {
         removeKeyboardNotifications()
     }
     
+    // MARK: - 사용자 정보 불러오기
     private func getProfile() {
-        guard let myProfile = MyProfile.shared.myUserInfo else { return }
-        profileName.text = myProfile.nickName
-        if let hobby = myProfile.hobbyList?.first {
-            choiceEnjoyTextField.text = hobby
+        if let profile = userProfile {
+            profileName.text = profile.nickName
+            selfInfoDetail.text = profile.description
         }
-        if let description = myProfile.description {
-            selfInfoDetail.text = description
-        }
-        if let profileMediumImageData = myProfile.profileImage[ImageSize.medium.rawValue],
-           let profileMediumImage = UIImage(data: profileMediumImageData) {
-            profileImage.setImage(profileMediumImage, for: .normal)
-            return
-        }
-        guard let imagePath = myProfile.profileImagePath else {
-              self.profileImage.setImage(UIImage(named: "profile"), for: .normal)
-            return
-        }
-        MyProfile.shared.loadImage(defaultPath: imagePath, paths: [.medium]) {
-            if let imageData = MyProfile.shared.myUserInfo?.profileImage[ImageSize.medium.rawValue],
-               let image = UIImage(data: imageData) {
-                DispatchQueue.main.async {
-                    self.profileImage.setImage(image, for: .normal)
+        else {
+            guard let myProfile = MyProfile.shared.myUserInfo else { return }
+            profileName.text = myProfile.nickName
+            if let hobby = myProfile.hobbyList?.first {
+                choiceEnjoyTextField.text = hobby
+            }
+            if let description = myProfile.description {
+                selfInfoDetail.text = description
+            }
+            if let profileMediumImageData = myProfile.profileImage[ImageSize.medium.rawValue],
+               let profileMediumImage = UIImage(data: profileMediumImageData) {
+                profileImage.setImage(profileMediumImage, for: .normal)
+                return
+            }
+            guard let imagePath = myProfile.profileImagePath else {
+                self.profileImage.setImage(UIImage(named: "profile"), for: .normal)
+                return
+            }
+            MyProfile.shared.loadImage(defaultPath: imagePath, paths: [.medium]) {
+                if let imageData = MyProfile.shared.myUserInfo?.profileImage[ImageSize.medium.rawValue],
+                   let image = UIImage(data: imageData) {
+                    DispatchQueue.main.async {
+                        self.profileImage.setImage(image, for: .normal)
+                    }
                 }
             }
         }
@@ -252,6 +260,7 @@ class MyProfileViewController: UIViewController {
     }
         
     func setLayout() {
+        view.backgroundColor = UIColor(color: .backgroundPrimary)
         view.addSubview(scrollView)
         scrollView.addSubview(profileImage)
         scrollView.addSubview(profileName)

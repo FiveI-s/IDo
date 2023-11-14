@@ -10,6 +10,8 @@ import SnapKit
 
 class CommentTableViewCell: UITableViewCell, Reusable {
     
+    var onImageTap: (() -> Void)?
+    
     let writeInfoView: WriterStackView = WriterStackView()
     var contentLabel: UILabel = {
         let label = UILabel()
@@ -45,6 +47,12 @@ extension CommentTableViewCell {
             self.writeInfoView.writerImageView.imageView.backgroundColor = color
             self.writeInfoView.writerImageView.contentMargin = margin
         }
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        writeInfoView.writerImageView.imageView.isUserInteractionEnabled = true
+        writeInfoView.writerImageView.imageView.addGestureRecognizer(tapGesture)
+    }
+    @objc private func profileImageTapped() {
+        onImageTap?()
     }
 }
 

@@ -8,6 +8,8 @@
 import UIKit
 
 final class MemberTableViewCell: UITableViewCell, Reusable {
+    
+    var onImageTap: (() -> Void)?
 
     let profileImageView: BasicImageView = {
         let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
@@ -47,6 +49,7 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setup()
+        addTapGestureToProfileImageView()
     }
     
     required init?(coder: NSCoder) {
@@ -113,4 +116,15 @@ extension MemberTableViewCell {
             self.profileImageView.contentMargin = margin
         }
     }
+    
+    private func addTapGestureToProfileImageView() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        profileImageView.isUserInteractionEnabled = true
+        profileImageView.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func profileImageTapped() {
+        onImageTap?()
+    }
+    
 }

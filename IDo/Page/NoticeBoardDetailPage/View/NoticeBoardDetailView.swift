@@ -10,6 +10,8 @@ import UIKit
 
 final class NoticeBoardDetailView: UIStackView {
     
+    var onImageTap: (() -> Void)?
+    
     let writerInfoView: WriterStackView = WriterStackView()
     let contentTitleLabel: UILabel = {
         let label = UILabel()
@@ -49,6 +51,7 @@ final class NoticeBoardDetailView: UIStackView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
+        addTapGestureToProfileImageView()
     }
     
     required init(coder: NSCoder) {
@@ -131,5 +134,14 @@ extension NoticeBoardDetailView {
         writerInfoView.writerImageView.imageView.image = image
         writerInfoView.writerImageView.contentMargin = 0
         writerInfoView.writerImageView.backgroundColor = UIColor(color: .white)
+    }
+    private func addTapGestureToProfileImageView() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        writerInfoView.writerImageView.isUserInteractionEnabled = true
+        writerInfoView.writerImageView.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func profileImageTapped() {
+        onImageTap?()
     }
 }

@@ -85,10 +85,6 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
             cell.indexPath = indexPath
             firebaseManager.getUserImage(referencePath: profileImageURL, imageSize: .medium) { downloadedImage in
                 if let image = downloadedImage {
-//                    DispatchQueue.main.async {
-//                        //cell.profileImageView.imageView.image = image
-//                        cell.setUserImage(profileImage: image, color: UIColor(color: .contentBackground))
-//                    }
                     cell.setUserImage(profileImage: image, color: UIColor(color: .white), margin: 0)
                 }
             }
@@ -101,6 +97,10 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
         cell.nameLabel.text = firebaseManager.noticeBoards[indexPath.row].rootUser.nickName
         cell.commentLabel.text = firebaseManager.noticeBoards[indexPath.row].commentCount
         cell.selectionStyle = .none
+        
+        cell.onImageTap = { [weak self] in
+            self?.navigateToProfilePage(for: indexPath)
+        }
         return cell
     }
     
@@ -140,6 +140,45 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
             return UISwipeActionsConfiguration(actions: [])
         }
     }
+    func navigateToProfilePage(for indexPath: IndexPath) {
+        let profile = firebaseManager.noticeBoards[indexPath.row].rootUser
+        let profileViewController = MyProfileViewController()
+        profileViewController.userProfile = profile
+
+        if let profileImageURL = profile.profileImagePath {
+            firebaseManager.getUserImage(referencePath: profileImageURL, imageSize: .medium) { [weak profileViewController] downloadedImage in
+                DispatchQueue.main.async {
+                    if let image = downloadedImage {
+                        profileViewController?.profileImage.setImage(image, for: .normal)
+                    }
+                }
+            }
+        }
+        else {
+            
+            if let defaultImage = UIImage(named: "profile") {
+                profileViewController.profileImage.setImage(defaultImage, for: .normal)
+            }
+        }
+
+        profileViewController.profileName.text = profile.nickName
+        if let hobbyList = profile.hobbyList {
+            profileViewController.choiceEnjoyTextField.text = hobbyList.first
+        }
+        profileViewController.selfInfoDetail.text = profile.description
+        
+        profileViewController.profileImage.isUserInteractionEnabled = true
+        profileViewController.profileName.isEditable = false
+        profileViewController.choicePickerView.isUserInteractionEnabled = false
+        profileViewController.selfInfoDetail.isEditable = false
+        profileViewController.logout.isHidden = true
+        profileViewController.line.isHidden = true
+        profileViewController.deleteID.isHidden = true
+
+         // 전체 화면으로 모달을 표시하려면 이 줄을 추가하세요.
+        self.present(profileViewController, animated: true, completion: nil)
+    }
+
 }
 
 // MARK: - FirebaseManaerDelegate 관련

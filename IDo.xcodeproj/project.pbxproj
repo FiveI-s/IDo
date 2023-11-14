@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1024EC0F2B038D39002095B5 /* PresentToProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024EC0E2B038D39002095B5 /* PresentToProfileVC.swift */; };
 		102C6E2A2AFAB0FE008BBB37 /* NoticeBoardImagePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102C6E292AFAB0FE008BBB37 /* NoticeBoardImagePath.swift */; };
 		10790B972AF7B35F001F6CCB /* NavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10790B962AF7B35F001F6CCB /* NavigationBar.swift */; };
 		10B174882ADAE11C00BF4273 /* SpoqaHanSansNeo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 10B174832ADAE11A00BF4273 /* SpoqaHanSansNeo-Bold.ttf */; };
@@ -120,6 +121,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1024EC0E2B038D39002095B5 /* PresentToProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentToProfileVC.swift; sourceTree = "<group>"; };
 		102C6E292AFAB0FE008BBB37 /* NoticeBoardImagePath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBoardImagePath.swift; sourceTree = "<group>"; };
 		10790B962AF7B35F001F6CCB /* NavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBar.swift; sourceTree = "<group>"; };
 		10842A202AE0FCB700684FDE /* NoticeBoardCRUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBoardCRUD.swift; sourceTree = "<group>"; };
@@ -409,6 +411,7 @@
 				18C65F352AEA5AA7006A3A79 /* MyProfile.swift */,
 				18C65F372AEA84D5006A3A79 /* ProfileImageCache.swift */,
 				18B5919F2AF1D658002A684D /* DataModelCodable.swift */,
+				1024EC0E2B038D39002095B5 /* PresentToProfileVC.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -724,6 +727,7 @@
 				7B226EF22AEBD85900EAED75 /* NoticeMeetingController.swift in Sources */,
 				7B226EF32AEBD85900EAED75 /* NoticeHomeController.swift in Sources */,
 				18D764AA2AF3C30C00AD6140 /* IntrinsicTableView.swift in Sources */,
+				1024EC0F2B038D39002095B5 /* PresentToProfileVC.swift in Sources */,
 				7B226EF42AEBD85900EAED75 /* NoticeBoardViewController.swift in Sources */,
 				7B226EF52AEBD85900EAED75 /* NoticeBoardView.swift in Sources */,
 				18A860AD2AFB7430002DC32B /* MyProfileUpdateManager.swift in Sources */,

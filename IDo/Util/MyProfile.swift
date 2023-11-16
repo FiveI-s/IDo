@@ -14,12 +14,31 @@ final class MyProfile {
     
     static let shared = MyProfile()
     private var firebaseManager: MyProfileUpdateManager!
+    private var ref: DatabaseReference = Database.database().reference()
     private var fileCache: ProfileImageCache = ProfileImageCache()
     var myUserInfo: MyUserInfo?
     
     private init() {}
     
     func getUserProfile(uid: String, completion: ((Bool) -> Void)? = nil) {
+        ref = ref.child("Users").child(uid)
+        
+        ref.observe(.value) { dataSnapShot, _  in
+            guard let value = dataSnapShot.value,
+                  dataSnapShot.exists() else {
+                print("User 정보를 가져오지 못했습니다.")
+                return
+            }
+            guard let idoUser: IDoUser = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                print("나의 User정보를 IdoUser 형태로 디코딩하지 못했습니다.")
+                return
+            }
+            self.myUserInfo = idoUser.toMyUserInfo
+            if let profilePath = idoUser.profileImagePath {
+                self.loadImage(defaultPath: profilePath, paths: ImageSize.allCases)
+                return
+            }
+        }
         firebaseManager = MyProfileUpdateManager(refPath: ["Users",uid])
         //MARK: 데이터가 바꼈는지 체크하는 부분 로직 생각해보기
 //        if let currentUser = fileCache.getFile(uid: uid) {
@@ -78,44 +97,63 @@ final class MyProfile {
     }
     
     func update(nickName: String? = nil, updateProfileImage: UIImage? = nil, description: String? = nil, myClubList: [Club]? = nil, hobbyList: [String]? = nil, myNoticeBoardList: [NoticeBoard]? = nil, myCommentList: [Comment]? = nil, completion: ((Bool) -> Void)? = nil) {
-        var myInfo = self.myUserInfo
-        if let nickName {
-            myInfo?.nickName = nickName
-        }
-        if let updateProfileImage {
-            let smallImage = updateProfileImage.resizeImage(targetSize: CGSize(width: 90, height: 90))
-            let mediumImage = updateProfileImage.resizeImage(targetSize: CGSize(width: 480, height: 480))
-            if let smallImageData = smallImage.pngData(),
-               let mediumImageData = mediumImage.pngData() {
-                myInfo?.profileImage[ImageSize.small.rawValue] = smallImageData
-                myInfo?.profileImage[ImageSize.small.rawValue] = mediumImageData
-                uploadProfileImage(imageData: smallImageData, imageSize: .small)
-                uploadProfileImage(imageData: mediumImageData, imageSize: .medium)
-            }
-        }
-        if let description {
-            myInfo?.description = description
-        }
-        if let myClubList {
-            myInfo?.myClubList = myClubList
-        }
-        if let hobbyList {
-            myInfo?.hobbyList = hobbyList
-        }
-        if let myNoticeBoardList {
-            myInfo?.myNoticeBoardList = myNoticeBoardList
-        }
-        if let myCommentList {
-            myInfo?.myCommentList = myCommentList
-        }
-        guard let idoUser = myInfo?.toIDoUser else { return }
-        firebaseManager.updateUser(idoUser: idoUser) { isCompletion in
-            if isCompletion {
-                self.myUserInfo = myInfo
-                completion?(isCompletion)
+        guard let myUserInfo = self.myUserInfo else { return }
+        let ref = Database.database().reference().child("Users").child(myUserInfo.id)
+        ref.getData { error, dataSnapShot in
+            if let error {
+                print(error.localizedDescription)
                 return
             }
-            completion?(false)
+            guard let value = dataSnapShot?.value else {
+                print("나의 프로필 정보를 가져오지 못했습니다")
+                return
+            }
+            guard let user: IDoUser = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                print("나의 프로필 정보를 디코딩하지 못했습니다.")
+                return
+            }
+            var myInfo = user.toMyUserInfo
+            if let profileImage = self.myUserInfo?.profileImage {
+                myInfo.profileImage = profileImage
+            }
+            if let nickName {
+                myInfo.nickName = nickName
+            }
+            if let updateProfileImage {
+                let smallImage = updateProfileImage.resizeImage(targetSize: CGSize(width: 90, height: 90))
+                let mediumImage = updateProfileImage.resizeImage(targetSize: CGSize(width: 480, height: 480))
+                if let smallImageData = smallImage.pngData(),
+                   let mediumImageData = mediumImage.pngData() {
+                    myInfo.profileImage[ImageSize.small.rawValue] = smallImageData
+                    myInfo.profileImage[ImageSize.small.rawValue] = mediumImageData
+                    self.uploadProfileImage(imageData: smallImageData, imageSize: .small)
+                    self.uploadProfileImage(imageData: mediumImageData, imageSize: .medium)
+                }
+            }
+            if let description {
+                myInfo.description = description
+            }
+            if let myClubList {
+                myInfo.myClubList = myClubList
+            }
+            if let hobbyList {
+                myInfo.hobbyList = hobbyList
+            }
+            if let myNoticeBoardList {
+                myInfo.myNoticeBoardList = myNoticeBoardList
+            }
+            if let myCommentList {
+                myInfo.myCommentList = myCommentList
+            }
+            let idoUser = myInfo.toIDoUser
+            self.firebaseManager.updateUser(idoUser: idoUser) { isCompletion in
+                if isCompletion {
+                    self.myUserInfo = myInfo
+                    completion?(isCompletion)
+                    return
+                }
+                completion?(false)
+            }
         }
     }
     
@@ -175,6 +213,14 @@ final class MyProfile {
             }
         }
         completion?(true)
+    }
+    
+    func isJoin(in club: Club) -> Bool {
+        return club.userList?.contains(where: { $0.id == myUserInfo?.id }) ?? false
+    }
+    
+    deinit {
+        ref.removeAllObservers()
     }
 }
 

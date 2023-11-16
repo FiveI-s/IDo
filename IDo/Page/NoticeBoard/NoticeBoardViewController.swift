@@ -32,15 +32,20 @@ class NoticeBoardViewController: UIViewController {
         noticeBoardView.noticeBoardTableView.delegate = self
         noticeBoardView.noticeBoardTableView.dataSource = self
         
+        firebaseManager.observeClubUserList()
         firebaseManager.readNoticeBoard()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         firebaseManager.delegate = self
-        
-        
+        isClubExists()
+        isMyClub()
+    }
+    
+    deinit {
+        print("NoticeBoardViewController Deinit")
+        firebaseManager.removeObserveClubUserList()
     }
     
     private func selectView() {
@@ -64,6 +69,27 @@ class NoticeBoardViewController: UIViewController {
         subView.snp.makeConstraints { make in
             make.top.leading.trailing.bottom.equalToSuperview()
         }
+    }
+}
+
+//MARK: Club 확인 관련
+extension NoticeBoardViewController {
+    private func isMyClub() {
+        guard MyProfile.shared.isJoin(in: firebaseManager.club) else {
+            AlertManager.showIsNotClubMemberChek(on: self)
+            return
+        }
+        return
+    }
+    
+    private func isClubExists() {
+        if firebaseManager.isClubExists == false {
+            AlertManager.showAlert(on: self, title: "클럽이 존재하지 않습니다", message: nil) { _ in
+                self.navigationController?.popViewController(animated: true)
+            }
+            return
+        }
+        return 
     }
 }
 

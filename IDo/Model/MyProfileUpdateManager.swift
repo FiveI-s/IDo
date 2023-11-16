@@ -47,14 +47,26 @@ class MyProfileUpdateManager: FBDatabaseManager<IDoUser> {
                 print("내 유저 정보를 찾을수 없습니다")
                 return
             }
-            clubUserRef.updateChildValues(["\(index)": idoUser.toUserSummary.dictionary as Any]) { error, _ in
-                if let error {
-                    print(error.localizedDescription)
-                    completion?(false)
-                    return
-                }
-                completion?(true)
-            }
+            //TODO: 지금은 급한대로 신고횟수는 건드리지 않도록 4번 연속으로 데이터를 각자 업데이트하지만 나중엔 idoUser.toUserSummary.dictionary를 한번에 업데이트 하도록 수정하기
+            let descriptionRef = clubUserRef.child("\(index)").child("description")
+            let idRef = clubUserRef.child("\(index)").child("id")
+            let nickNameRef = clubUserRef.child("\(index)").child("nickName")
+            let profileImagePathRef = clubUserRef.child("\(index)").child("profileImagePath")
+            
+            let userSummary = idoUser.toUserSummary
+            descriptionRef.setValue(userSummary.description)
+            idRef.setValue(userSummary.id)
+            nickNameRef.setValue(userSummary.nickName)
+            profileImagePathRef.setValue(userSummary.profileImagePath)
+            completion?(true)
+//            clubUserRef.updateChildValues(["\(index)": idoUser.toUserSummary.dictionary as Any]) { error, _ in
+//                if let error {
+//                    print(error.localizedDescription)
+//                    completion?(false)
+//                    return
+//                }
+//                completion?(true)
+//            }
         }
         
         let clubRootUserRef = defaultRef.child(club.category).child("meetings").child(club.id).child("rootUser")
@@ -74,18 +86,17 @@ class MyProfileUpdateManager: FBDatabaseManager<IDoUser> {
                 print(error.localizedDescription)
                 return
             }
-            guard let dataSnapShot = dataSnapShot?.value else {
-                print("게시판 데이터를 가져오지 못했습니다")
-                return
-            }
-            guard let noticeBoard: NoticeBoard = DataModelCodable.decodingSingleDataSnapshot(value: dataSnapShot) else {
-                print("datasnapshot을 게시판으로 디코딩하지 못했습니다")
-                return
-            }
-            let noticeBoardRootUserRef = noticeBoardRef.child("rootUser")
-            noticeBoardRootUserRef.setValue(idoUser.toUserSummary.dictionary) { error, _ in
-                if let error {
-                    print(error.localizedDescription)
+//            guard let dataSnapShot = dataSnapShot?.value else {
+//                print("게시판 데이터를 가져오지 못했습니다")
+//                return
+//            }
+            if let dataSnapShot,
+               dataSnapShot.exists() {
+                let noticeBoardRootUserRef = noticeBoardRef.child("rootUser")
+                noticeBoardRootUserRef.setValue(idoUser.toUserSummary.dictionary) { error, _ in
+                    if let error {
+                        print(error.localizedDescription)
+                    }
                 }
             }
         }

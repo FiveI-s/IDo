@@ -68,6 +68,23 @@ class CreateNoticeBoardViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        if firebaseManager.isClubExists == false {
+            AlertManager.showAlert(on: self, title: "클럽이 존재하지 않습니다", message: nil) { _ in
+                if let navigationController = self.navigationController {
+                    for controller in navigationController.viewControllers {
+                        if let meetingVC = controller as? MeetingViewController {
+                            navigationController.popToViewController(meetingVC, animated: true)
+                            break
+                        }
+                    }
+                    navigationController.popToRootViewController(animated: true)
+                }
+            }
+        }
+        guard MyProfile.shared.isJoin(in: firebaseManager.club) else {
+            AlertManager.showIsNotClubMemberChek(on: self)
+            return
+        }
         addKeyboardNotifications()
     }
     
@@ -80,6 +97,10 @@ class CreateNoticeBoardViewController: UIViewController {
             firebaseManager.removeSelecteImage.removeAll()
             firebaseManager.missSelectedImage.removeAll()
             isEditingMode = false
+        }
+        guard MyProfile.shared.isJoin(in: firebaseManager.club) else {
+            AlertManager.showIsNotClubMemberChek(on: self)
+            return
         }
         removeKeyboardNotifications()
     }

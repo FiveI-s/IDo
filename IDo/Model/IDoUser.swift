@@ -21,7 +21,6 @@ struct IDoUser: Codable, Identifier {
     var myCommentList: [Comment]?
 
     var toMyUserInfo: MyUserInfo {
-        print(myClubList)
         return MyUserInfo(id: id, updateAt: updateAt, profileImagePath: profileImagePath, profileImage: [:], nickName: nickName, description: description, hobbyList: hobbyList, myClubList: myClubList, myNoticeBoardList: myNoticeBoardList, myCommentList: myCommentList)
     }
     var toUserSummary: UserSummary {

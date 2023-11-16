@@ -14,6 +14,7 @@ import UIKit
 final class NoticeHomeController: UIViewController {
     var signUpButtonUpdate: ((AuthState) -> Void)?
     private let firebaseClubDatabaseManager: FirebaseClubDatabaseManager
+    private let firebaseNoticeBoardManager: FirebaseManager
     private let clubImage: UIImage? = nil
     private let club: Club
     
@@ -80,9 +81,10 @@ final class NoticeHomeController: UIViewController {
         return view
     }()
     
-    init(club: Club, authState: AuthState, firebaseClubDataManager: FirebaseClubDatabaseManager) {
+    init(club: Club, authState: AuthState, firebaseClubDataManager: FirebaseClubDatabaseManager, firebaseNoticeBoardManager: FirebaseManager) {
         self.club = club
         self.firebaseClubDatabaseManager = firebaseClubDataManager
+        self.firebaseNoticeBoardManager = firebaseNoticeBoardManager
         self.authState = authState
         super.init(nibName: nil, bundle: nil)
         
@@ -121,9 +123,26 @@ final class NoticeHomeController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         //loadDataFromFirebase()
         super.viewWillAppear(animated)
+        guard isClubExists() else { return }
+        memberTableView.reloadData()
     }
     
     @objc func handleSignUp() {
+        if let myInfo = MyProfile.shared.myUserInfo,
+           let blackList = firebaseNoticeBoardManager.club.blackList,
+           blackList.contains(where: { $0.id == myInfo.id }){
+            AlertManager.showAlert(on: self, title: "모임에서 추방당하여 \n 모임에 가입할 수 없습니다.", message: nil) { [weak self] _ in
+                if let navigationController = self?.navigationController {
+                    for controller in navigationController.viewControllers {
+                        if let meetingVC = controller as? MeetingViewController {
+                            navigationController.popToViewController(meetingVC, animated: true)
+                            break
+                        }
+                    }
+                }
+            }
+            return
+        }
         signUpButton.isEnabled = false
         print("Sign Up button tapped!.")
         addUser()
@@ -150,6 +169,9 @@ final class NoticeHomeController: UIViewController {
                 self.signUpButton.snp.updateConstraints { make in
                     make.height.equalTo(0)
                 }
+                var userList = self.firebaseNoticeBoardManager.club.userList ?? []
+                userList.append(idoUser.toUserSummary)
+                self.firebaseNoticeBoardManager.club.userList = userList
             }
             let authState: AuthState = isCompleted ? .member : .notMember
             guard let count = self.firebaseClubDatabaseManager.model?.userList?.count else {
@@ -253,6 +275,18 @@ final class NoticeHomeController: UIViewController {
     }
 }
 
+extension NoticeHomeController {
+    private func isClubExists() -> Bool {
+        if firebaseNoticeBoardManager.isClubExists == false {
+            AlertManager.showAlert(on: self, title: "클럽이 존재하지 않습니다", message: nil) { _ in
+                self.navigationController?.popViewController(animated: true)
+            }
+            return false
+        }
+        return true
+    }
+}
+
 extension NoticeHomeController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return firebaseClubDatabaseManager.model?.userList?.count ?? 0
@@ -303,7 +337,7 @@ extension NoticeHomeController: UITableViewDelegate, UITableViewDataSource {
         guard authState == .root,
               let user = firebaseClubDatabaseManager.model?.userList?[indexPath.row] else { return nil }
         let removeAction = UIContextualAction(style: .normal, title: "삭제") { _, _, _ in
-            self.firebaseClubDatabaseManager.removeUser(user: user) { isCompleted in
+            self.firebaseClubDatabaseManager.removeMyUser(user: user) { isCompleted in
                 if isCompleted {
                     tableView.beginUpdates()
                     tableView.deleteRows(at: [indexPath], with: .automatic)

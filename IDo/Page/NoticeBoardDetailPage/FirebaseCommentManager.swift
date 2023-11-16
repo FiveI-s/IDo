@@ -50,21 +50,12 @@ class FirebaseCommentManaer: FBDatabaseManager<Comment> {
         }
     }
     
-    func updateNoticeBoard(completion: ((Bool) -> Void)? = nil) {
-        noticeBoardRef.updateChildValues(["commentCount": "\(modelList.count)"]) { error, _ in
-            if let error {
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
     func deleteAllCommentList() {
         ref.removeValue { error, _ in
             if let error {
                 print(error.localizedDescription)
                 return
             }
-            self.modelList.removeAll()
             if let myUserInfo = MyProfile.shared.myUserInfo {
                 let deleteMyCommentList = self.modelList.filter{ $0.writeUser.id == myUserInfo.id }
                 var myCommentList = MyProfile.shared.myUserInfo?.myCommentList

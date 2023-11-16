@@ -47,10 +47,17 @@ final class NoticeMeetingController: TabmanViewController {
         } else {
             self.authState = .notMember
         }
-        self.homeVC = NoticeHomeController(club: club, authState: authState, firebaseClubDataManager: firebaseClubDatabaseManager)
+        self.homeVC = NoticeHomeController(club: club, authState: authState, firebaseClubDataManager: firebaseClubDatabaseManager, firebaseNoticeBoardManager: firebaseManager)
         super.init(nibName: nil, bundle: nil)
         
-        firebaseClubDatabaseManager.readData()
+        firebaseClubDatabaseManager.readData { result in
+            switch result {
+            case .success(let club):
+                self.firebaseManager.club = club
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
         homeVC.signUpButtonUpdate = { [weak self] authState in
             self?.authState = authState
         }
@@ -66,6 +73,10 @@ final class NoticeMeetingController: TabmanViewController {
         authCheck()
         setupTabman()
         setupNavigationBar()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
     }
     
     private func setupNavigationBar() {
@@ -225,10 +236,10 @@ extension NoticeMeetingController {
     private func outClub() {
         guard let myUserSummary = MyProfile.shared.myUserInfo?.toUserSummary,
               let outUserIndex = self.firebaseClubDatabaseManager.model?.userList?.firstIndex(where: { $0.id == myUserSummary.id }) else { return }
-        firebaseClubDatabaseManager.removeUser(user: myUserSummary) { isCompleted in
+        firebaseClubDatabaseManager.removeMyUser(user: myUserSummary) { isCompleted in
             if isCompleted {
                 self.authState = .notMember
-//                self.homeVC.signUpButton.isHidden = false
+                self.homeVC.signUpButton.isEnabled = true
                 self.homeVC.signUpButton.snp.updateConstraints { make in
                     make.height.equalTo(50)
                 }

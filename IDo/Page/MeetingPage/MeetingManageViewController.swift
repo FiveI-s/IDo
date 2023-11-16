@@ -99,7 +99,7 @@ class MeetingManageViewController: UIViewController {
     
     var profileImageButton: MeetingProfileImageButton = {
         let button = MeetingProfileImageButton()
-        button.addTarget(self, action: #selector(profileImageTapped), for: .touchUpInside)
+        button.addTarget(MeetingManageViewController.self, action: #selector(profileImageTapped), for: .touchUpInside)
         return button
     }()
     

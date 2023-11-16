@@ -28,7 +28,7 @@ class MeetingCreateViewController: UIViewController {
     var originalY: CGFloat?
     let profileImageButton: MeetingProfileImageButton = {
         let button = MeetingProfileImageButton()
-        button.addTarget(self, action: #selector(profileImageTapped), for: .touchUpInside)
+        button.addTarget(MeetingCreateViewController.self, action: #selector(profileImageTapped), for: .touchUpInside)
         return button
     }()
     

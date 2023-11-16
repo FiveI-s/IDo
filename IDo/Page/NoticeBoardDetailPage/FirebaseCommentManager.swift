@@ -61,8 +61,8 @@ class FirebaseCommentManaer: FBDatabaseManager<Comment> {
                 var myCommentList = MyProfile.shared.myUserInfo?.myCommentList
                 for deleteComment in deleteMyCommentList {
                     myCommentList?.removeAll(where: { $0.id == deleteComment.id })
-                    MyProfile.shared.update(myCommentList: myCommentList)
                 }
+                MyProfile.shared.update(myCommentList: myCommentList)
             }
         }
     }

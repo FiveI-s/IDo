@@ -97,9 +97,9 @@ class MeetingManageViewController: UIViewController {
         return view
     }()
     
-    var profileImageButton: MeetingProfileImageButton = {
+    lazy var profileImageButton: MeetingProfileImageButton = {
         let button = MeetingProfileImageButton()
-        button.addTarget(MeetingManageViewController.self, action: #selector(profileImageTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(profileImageTapped), for: .touchUpInside)
         return button
     }()
     

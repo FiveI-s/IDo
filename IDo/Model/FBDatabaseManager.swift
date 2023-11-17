@@ -10,6 +10,11 @@ import FirebaseDatabase
 
 class FBDatabaseManager<T: Codable & Identifier> {
     
+    enum FirebaseError: Error {
+        case datasnapshotNil
+        case decodingError
+    }
+    
     typealias isDatabaseActionComplete = Bool
     
     var ref: DatabaseReference
@@ -92,17 +97,20 @@ class FBDatabaseManager<T: Codable & Identifier> {
             }
             guard let dataSnapshot else {
                 self.viewState = .error(false)
+                completion(.failure(FirebaseError.datasnapshotNil))
                 self.update()
                 return
             }
             guard let value = dataSnapshot.value as? [String: Any] else {
                 self.viewState = .loaded
                 self.modelList = []
+                completion(.failure(FirebaseError.decodingError))
                 return
             }
             
             guard let data: T = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
                 print("decoding error")
+                completion(.failure(FirebaseError.decodingError))
                 return
             }
             self.model = data

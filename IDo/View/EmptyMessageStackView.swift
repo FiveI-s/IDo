@@ -10,6 +10,7 @@ import UIKit
 final class EmptyMessageStackView: UIStackView {
     enum MessageType {
         case networkError
+        case noMember
         case commentEmpty
         case clubEmpty
         case noticeBoardEmpty
@@ -137,6 +138,10 @@ private extension EmptyMessageStackView {
              취미가 맞는 모임에 참여하시고
              서로의 취향을 공유해 보세요
             """
+        case .noMember:
+            setImage(image: UIImage(systemName: "person.2.fill"))
+            titleLabel.text = "차단한 사용자가 없습니다."
+            descriptionLabel.text = ""
         case .custom(let image, let title, let description):
             setImage(image: image)
             titleLabel.text = title

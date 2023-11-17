@@ -41,6 +41,9 @@ class NoticeBoardViewController: UIViewController {
         firebaseManager.delegate = self
         isClubExists()
         isMyClub()
+        firebaseManager.readNoticeBoard { [weak self] _ in
+            self?.noticeBoardView.noticeBoardTableView.reloadData()
+        }
     }
     
     deinit {

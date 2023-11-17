@@ -434,8 +434,10 @@ private extension MyProfileViewController {
         
     func navigationBarButtonAction() {
         // 네비게이션 오른쪽 버튼 생성
-        let editButton = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: self, action: #selector(editVC))
-        navigationItem.rightBarButtonItem = editButton
+        let editButton = UIBarButtonItem(title: "수정", style: .plain, target: self, action: #selector(editVC))
+        let blockListButton = UIBarButtonItem(title: "차단 목록", style: .plain, target: self, action: #selector(moveBlockList))
+        blockListButton.tintColor = UIColor(color: .negative)
+        navigationItem.rightBarButtonItems = [editButton, blockListButton]
         navigationItem.rightBarButtonItem?.tintColor = UIColor(color: .main)
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(profileUpdateCancle))
@@ -475,7 +477,7 @@ private extension MyProfileViewController {
         
         hiddenLeftButton()
         
-        navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
+        navigationItem.rightBarButtonItems?.first?.title = "수정"
         
         profileName.isUserInteractionEnabled = false
         profileName.backgroundColor = .clear
@@ -508,6 +510,11 @@ private extension MyProfileViewController {
         }
         
         choiceEnjoyTextField.tintColor = .clear
+    }
+    
+    @objc func moveBlockList() {
+        let vc = BlockListViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     // 수정 버튼을 눌렀을 때
@@ -545,7 +552,7 @@ private extension MyProfileViewController {
                 isEdit = true
             }
             else {
-                navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
+                navigationItem.rightBarButtonItems?.first?.title = "수정"
                 hiddenLeftButton()
                 
                 profileName.isUserInteractionEnabled = false

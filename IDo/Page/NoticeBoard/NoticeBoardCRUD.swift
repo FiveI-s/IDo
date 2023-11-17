@@ -126,8 +126,12 @@ class FirebaseManager {
                 return
             }
             
-            let newNoticeBoards: [NoticeBoard] = DataModelCodable.decodingDataSnapshot(value: value)
+            var newNoticeBoards: [NoticeBoard] = DataModelCodable.decodingDataSnapshot(value: value)
             
+            var myBlockList = MyProfile.shared.myUserInfo?.blockList ?? []
+            myBlockList.forEach { blockUser in
+                newNoticeBoards.removeAll(where: { $0.rootUser.id == blockUser.id })
+            }
             self.noticeBoards = newNoticeBoards.sorted(by: { $0.createDate > $1.createDate })
             
             self.delegate?.reloadData()

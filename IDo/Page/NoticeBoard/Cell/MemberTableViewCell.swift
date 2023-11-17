@@ -10,6 +10,7 @@ import UIKit
 final class MemberTableViewCell: UITableViewCell, Reusable {
     
     var onImageTap: (() -> Void)?
+    var onXmarkTap: (() -> Void)?
 
     let profileImageView: BasicImageView = {
         let imageView = BasicImageView(image: UIImage(systemName: "person.fill"))
@@ -44,12 +45,20 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
         return imageView
     }()
     
+    let xmarkImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "xmark"))
+        imageView.tintColor = UIColor(color: .black)
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     var imageSize: CGFloat = 36
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setup()
         addTapGestureToProfileImageView()
+        addTapGestureToXmarkImageView()
     }
     
     required init?(coder: NSCoder) {
@@ -67,6 +76,7 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
         contentView.addSubview(nameLabel)
         contentView.addSubview(descriptionLabel)
         contentView.addSubview(headImageView)
+        contentView.addSubview(xmarkImageView)
     }
     
     private func setupAutoLayout() {
@@ -92,6 +102,11 @@ final class MemberTableViewCell: UITableViewCell, Reusable {
 //            make.centerY.equalTo(nameLabel)
 //            make.left.equalTo(nameLabel.snp.right).offset(Constant.margin1)
 //            make.width.height.equalTo(imageSize/3)
+        }
+        xmarkImageView.snp.makeConstraints { make in
+            make.centerY.equalTo(profileImageView)
+            make.right.equalTo(contentView.snp.right)
+            make.width.height.equalTo(imageSize/2)
         }
     }
     
@@ -125,6 +140,16 @@ extension MemberTableViewCell {
     
     @objc private func profileImageTapped() {
         onImageTap?()
+    }
+    
+    private func addTapGestureToXmarkImageView() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(xmarkImageTapped))
+        xmarkImageView.isUserInteractionEnabled = true
+        xmarkImageView.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func xmarkImageTapped() {
+        onXmarkTap?()
     }
     
 }

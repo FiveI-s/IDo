@@ -10,6 +10,43 @@ import FirebaseStorage
 import Foundation
 
 class FirebaseClubDatabaseManager: FBDatabaseManager<Club> {
+    
+    override func readData(completion: @escaping (Result<Club, Error>) -> Void = {_ in}) {
+        ref.getData { error, dataSnapshot in
+            if let error {
+                let nsError = error as NSError
+                if nsError.code == 1 { self.viewState = .error(true) }
+                else { self.viewState = .error(false) }
+                completion(.failure(nsError))
+                self.update()
+                return
+            }
+            guard let dataSnapshot else {
+                self.viewState = .error(false)
+                self.update()
+                return
+            }
+            guard let value = dataSnapshot.value as? [String: Any] else {
+                self.viewState = .loaded
+                self.modelList = []
+                return
+            }
+            
+            guard var club: Club = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                print("decoding error")
+                return
+            }
+            let blockUserList = MyProfile.shared.myUserInfo?.blockList ?? []
+            blockUserList.forEach { blockUser in
+                club.userList?.removeAll(where: { $0.id == blockUser.id })
+            }
+            self.model = club
+            completion(.success(club))
+            
+            self.viewState = .loaded
+        }
+    }
+    
     func removeMyClub(completion: ((Bool) -> Void)?) {
         guard let club = model else { return }
         ref.removeValue { error, _ in
@@ -25,42 +62,49 @@ class FirebaseClubDatabaseManager: FBDatabaseManager<Club> {
             if let imagePath = club.imageURL {
                 self.removeImage(path: imagePath)
             }
-            guard let myUserInfo = MyProfile.shared.myUserInfo else {
-                print("사용자 정보가 없어 내 클럽을 지울 수 없습니다.")
-                return
-            }
-            var myClubList = myUserInfo.myClubList ?? []
-            myClubList.removeAll(where: { $0.id == club.id })
-            MyProfile.shared.update(myClubList: myClubList) { _ in
-                completion?(true)
-            }
         }
     }
     
-    func removeClub(club: Club, userList: [UserSummary] ,completion: ((Bool) -> Void)?) {
+    func removeClub(club: Club ,completion: ((Bool) -> Void)? = nil) {
         let dispatchGroup = DispatchGroup()
         let clubRef = Database.database().reference().child(club.category).child("meetings").child(club.id)
-        clubRef.removeValue { error, _ in
+        clubRef.getData { error, dataSnapShot in
             if let error {
                 print(error.localizedDescription)
                 return
             }
-            for user in userList {
-                dispatchGroup.enter()
-                self.removeUserClub(user: user, removeClub: club) { _ in
-                    dispatchGroup.leave()
-                }
+            guard let value = dataSnapShot?.value else {
+                print("삭제할 클럽의 데이터를 가져오지 못했습니다")
+                return
             }
-            self.removeNoticeBoard(club: club)
-            if let imagePath = club.imageURL {
-                dispatchGroup.enter()
-                self.removeImage(path: imagePath) { _ in
-                    dispatchGroup.leave()
-                }
+            guard let club: Club = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                print("삭제할 클럽을 디코딩하지 못했습니다.")
+                return
             }
+            var userList = club.userList ?? []
             
-            dispatchGroup.notify(queue: .main) {
-                completion?(true)
+            clubRef.removeValue { error, _ in
+                if let error {
+                    print(error.localizedDescription)
+                    return
+                }
+                for user in userList {
+                    dispatchGroup.enter()
+                    self.removeUserClub(user: user, removeClub: club) { _ in
+                        dispatchGroup.leave()
+                    }
+                }
+                self.removeNoticeBoard(club: club)
+                if let imagePath = club.imageURL {
+                    dispatchGroup.enter()
+                    self.removeImage(path: imagePath) { _ in
+                        dispatchGroup.leave()
+                    }
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    completion?(true)
+                }
             }
         }
     }
@@ -425,16 +469,33 @@ class FirebaseClubDatabaseManager: FBDatabaseManager<Club> {
 
     func appendUser(user: UserSummary, completion: ((Bool) -> Void)? = nil) {
         guard let model else { return }
-        var userList = model.userList ?? []
-        userList.append(user)
-        ref.updateChildValues(["userList": userList.asArrayDictionary()]) { error, _ in
+        ref.getData { error, dataSnapShot in
             if let error {
                 print(error.localizedDescription)
                 return
             }
-            self.model?.userList = userList
-            completion?(true)
+            guard dataSnapShot?.exists() != nil,
+                  let value = dataSnapShot?.value else {
+                print("club 정보를 가져오지 못했습니다")
+                return
+            }
+            guard let club: Club = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                print("Club 정보를 디코딩 해오지 못했습니다.")
+                return
+            }
+            var userList = club.userList ?? []
+            userList.append(user)
+            self.ref.updateChildValues(["userList": userList.asArrayDictionary()]) { error, _ in
+                if let error {
+                    print(error.localizedDescription)
+                    return
+                }
+                self.model? = club
+                self.model?.userList = userList
+                completion?(true)
+            }
         }
+        
     }
     
     func removeMyUser(user: UserSummary, completion: ((Bool) -> Void)? = nil) {

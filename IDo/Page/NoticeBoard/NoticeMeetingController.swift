@@ -49,15 +49,6 @@ final class NoticeMeetingController: TabmanViewController {
         }
         self.homeVC = NoticeHomeController(club: club, authState: authState, firebaseClubDataManager: firebaseClubDatabaseManager, firebaseNoticeBoardManager: firebaseManager)
         super.init(nibName: nil, bundle: nil)
-        
-        firebaseClubDatabaseManager.readData { result in
-            switch result {
-            case .success(let club):
-                self.firebaseManager.club = club
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
         homeVC.signUpButtonUpdate = { [weak self] authState in
             self?.authState = authState
         }
@@ -77,6 +68,18 @@ final class NoticeMeetingController: TabmanViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        firebaseClubDatabaseManager.readData { result in
+            switch result {
+            case .success(var club):
+                let myBlockList = MyProfile.shared.myUserInfo?.blockList ?? []
+                myBlockList.forEach { blockUser in
+                    club.userList?.removeAll(where: { $0.id == blockUser.id })
+                }
+                self.firebaseManager.club = club
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
     
     private func setupNavigationBar() {
@@ -217,7 +220,7 @@ extension NoticeMeetingController {
     }
     
     private func removeClub() {
-        firebaseClubDatabaseManager.removeMyClub { isCompleted in
+        firebaseClubDatabaseManager.removeClub(club: club) { isCompleted in
             if isCompleted { self.navigationController?.popViewController(animated: true) }
         }
     }

@@ -209,8 +209,10 @@ extension NoticeBoardTableViewCell {
             self.profileImageView.contentMargin = margin
         }
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
-        profileImageView.imageView.isUserInteractionEnabled = true
-        profileImageView.imageView.addGestureRecognizer(tapGesture)
+        DispatchQueue.main.async {
+            self.profileImageView.imageView.isUserInteractionEnabled = true
+            self.profileImageView.imageView.addGestureRecognizer(tapGesture)
+        }
     }
     
     @objc private func profileImageTapped() {

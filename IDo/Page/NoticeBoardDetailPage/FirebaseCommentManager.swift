@@ -43,7 +43,11 @@ class FirebaseCommentManaer: FBDatabaseManager<Comment> {
                 completion(.success(self.modelList))
                 return
             }
-            let dataList: [Comment] = DataModelCodable.decodingDataSnapshot(value: value).sorted(by: { $0.createDate >= $1.createDate })
+            var dataList: [Comment] = DataModelCodable.decodingDataSnapshot(value: value).sorted(by: { $0.createDate >= $1.createDate })
+            let myBlockList = MyProfile.shared.myUserInfo?.blockList ?? []
+            myBlockList.forEach { blockUser in
+                dataList.removeAll(where: {$0.writeUser.id == blockUser.id})
+            }
             self.viewState = .loaded
             self.modelList = dataList
             completion(.success(dataList))

@@ -78,6 +78,7 @@ class HomeViewController : UIViewController {
         self.updateUIBasedOnData()
         self.makeTableView2()
         self.setLayout()
+        MyProfile.shared.addObserve()
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -256,7 +256,14 @@ private extension NoticeBoardDetailViewController {
                     
                     AlertManager.showDeclarationActionSheet(on: self, title: "신고하기", message: "신고의 이유를 해당 항목에서 선택해주세요.", spamHandler: spamHandler, dislikeHandler: dislikeHandler, selfHarmHandler: selfHarmHandler, illegalSaleHandler: illegalSaleHandler, nudityHandler: nudityHandler, hateSpeechHandler: hateSpeechHandler, violenceHandler: violenceHandler, bullyingHandler: bullyingHandler)
                 }
-                AlertManager.showDeclaration(on: self, title: "알림", message: "이 게시글을 신고하시겠습니까?", declarationHandler: declarationHandler)
+                let blockHandler: ((UIAlertAction) -> Void) = { [weak self] _ in
+                    guard let self else { return }
+                    MyProfile.shared.appendBlockUser(blockUser: self.noticeBoard.rootUser) {
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }
+                
+                AlertManager.showDeclaration(on: self, declarationHandler: declarationHandler, blockHandler: blockHandler)
             }
         }
     }
@@ -296,7 +303,7 @@ private extension NoticeBoardDetailViewController {
                         let user = self.firebaseNoticeBoardManager.noticeBoards[self.editIndex].rootUser
                         
                         if user.id == self.firebaseNoticeBoardManager.club.rootUser.id {
-                            self.firebaseClubDatabaseManager.removeClub(club: self.firebaseNoticeBoardManager.club, userList: userList) { isSuccess in
+                            self.firebaseClubDatabaseManager.removeClub(club: self.firebaseNoticeBoardManager.club) { isSuccess in
                                 if isSuccess {
                                     guard let uid = Auth.auth().currentUser?.uid else {
                                         return
@@ -327,8 +334,9 @@ private extension NoticeBoardDetailViewController {
         }
         let noticeBoardRootUser = firebaseNoticeBoardManager.noticeBoards[editIndex].rootUser
         let clubRootUser = firebaseNoticeBoardManager.club.rootUser
+        
         if noticeBoardRootUser.id == clubRootUser.id {
-            AlertManager.showCheckDeclaration(on: self, title: "알림", message: "해당 항목으로 이 게시글을 신고하시겠습니까?\n이 게시글은 모임장의 게시글입니다.\n신고당하면 모임이 삭제될 수 있습니다.", okHandler: okHandler)
+            AlertManager.showDeclaration(on: self, title: "알림", message: "해당 항목으로 이 게시글을 신고하시겠습니까?\n이 게시글은 모임장의 게시글입니다.\n신고당하면 모임이 삭제될 수 있습니다.", declarationHandler: okHandler)
         } else {
             AlertManager.showCheckDeclaration(on: self, title: "알림", message: "해당 항목으로 이 게시글을 신고하시겠습니까?", okHandler: okHandler)
         }
@@ -573,7 +581,27 @@ extension NoticeBoardDetailViewController: UITableViewDelegate, UITableViewDataS
                     
                     AlertManager.showDeclarationActionSheet(on: self, title: "신고하기", message: "신고의 이유를 해당 항목에서 선택해주세요.", spamHandler: spamHandler, dislikeHandler: dislikeHandler, selfHarmHandler: selfHarmHandler, illegalSaleHandler: illegalSaleHandler, nudityHandler: nudityHandler, hateSpeechHandler: hateSpeechHandler, violenceHandler: violenceHandler, bullyingHandler: bullyingHandler)
                 }
-                AlertManager.showDeclaration(on: self, title: "알림", message: "이 게시글을 신고하시겠습니까?", declarationHandler: declarationHandler)
+                let blockHandler: ((UIAlertAction) -> Void) = { [weak self] _ in
+                    guard let indexPath = tableView.indexPath(for: cell),
+                          let blockUser = self?.firebaseCommentManager.modelList[indexPath.row].writeUser else { return }
+                    MyProfile.shared.appendBlockUser(blockUser: blockUser) {
+                        self?.firebaseCommentManager.readDatas { result in
+                            switch result {
+                            case .success(let commentList):
+                                DispatchQueue.main.async {
+                                    if commentList.isEmpty {
+                                        self?.commentTableView.reloadSections(IndexSet(integer: 0), with: .none)
+                                    } else {
+                                        self?.commentTableView.reloadSections(IndexSet(integer: 1), with: .none)
+                                    }
+                                }
+                            case .failure(let error):
+                                print(error.localizedDescription)
+                            }
+                        }
+                    }
+                }
+                AlertManager.showDeclaration(on: self, title: nil, message: nil, declarationHandler: declarationHandler, blockHandler: blockHandler)
             }
         }
         guard let dateText = comment.createDate.diffrenceDate else { return cell }
@@ -639,7 +667,7 @@ extension NoticeBoardDetailViewController: UITableViewDelegate, UITableViewDataS
                     let user = userList[commentWriteUser]
                     
                     if user.id == self.firebaseNoticeBoardManager.club.rootUser.id {
-                        self.firebaseClubDatabaseManager.removeClub(club: self.firebaseNoticeBoardManager.club, userList: userList) { isSuccess in
+                        self.firebaseClubDatabaseManager.removeClub(club: self.firebaseNoticeBoardManager.club) { isSuccess in
                             if isSuccess {
                                 self.navigationController?.popToRootViewController(animated: true)
                             }

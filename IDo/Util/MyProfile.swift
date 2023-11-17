@@ -22,23 +22,6 @@ final class MyProfile {
     
     func getUserProfile(uid: String, completion: ((Bool) -> Void)? = nil) {
         ref = ref.child("Users").child(uid)
-        
-        ref.observe(.value) { dataSnapShot, _  in
-            guard let value = dataSnapShot.value,
-                  dataSnapShot.exists() else {
-                print("User 정보를 가져오지 못했습니다.")
-                return
-            }
-            guard let idoUser: IDoUser = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
-                print("나의 User정보를 IdoUser 형태로 디코딩하지 못했습니다.")
-                return
-            }
-            self.myUserInfo = idoUser.toMyUserInfo
-            if let profilePath = idoUser.profileImagePath {
-                self.loadImage(defaultPath: profilePath, paths: ImageSize.allCases)
-                return
-            }
-        }
         firebaseManager = MyProfileUpdateManager(refPath: ["Users",uid])
         //MARK: 데이터가 바꼈는지 체크하는 부분 로직 생각해보기
 //        if let currentUser = fileCache.getFile(uid: uid) {
@@ -96,7 +79,7 @@ final class MyProfile {
         fileCache.storeFile(myUserInfo: myUserInfo)
     }
     
-    func update(nickName: String? = nil, updateProfileImage: UIImage? = nil, description: String? = nil, myClubList: [Club]? = nil, hobbyList: [String]? = nil, myNoticeBoardList: [NoticeBoard]? = nil, myCommentList: [Comment]? = nil, completion: ((Bool) -> Void)? = nil) {
+    func update(nickName: String? = nil, updateProfileImage: UIImage? = nil, profileImagePath: String? = nil, description: String? = nil, myClubList: [Club]? = nil, hobbyList: [String]? = nil, myNoticeBoardList: [NoticeBoard]? = nil, myCommentList: [Comment]? = nil, completion: ((Bool) -> Void)? = nil) {
         guard let myUserInfo = self.myUserInfo else { return }
         let ref = Database.database().reference().child("Users").child(myUserInfo.id)
         ref.getData { error, dataSnapShot in
@@ -130,6 +113,9 @@ final class MyProfile {
                     self.uploadProfileImage(imageData: mediumImageData, imageSize: .medium)
                 }
             }
+            if let profileImagePath {
+                myInfo.profileImagePath = profileImagePath
+            }
             if let description {
                 myInfo.description = description
             }
@@ -157,16 +143,33 @@ final class MyProfile {
         }
     }
     
+    func appendBlockUser(blockUser: UserSummary, completion: (() -> Void)? = nil) {
+        guard let myUserInfo else { return }
+        firebaseManager.updateBlockUser(blockUser: blockUser, myProfile: myUserInfo) { isComplete in
+            completion?()
+        }
+    }
+    
+    func removeBlockUser(blockUser: UserSummary, completion: (() -> Void)? = nil) {
+        guard let myUserInfo else { return }
+        firebaseManager.removeBlockUser(blockUser: blockUser, myProfile: myUserInfo) { isComplete in
+            completion?()
+        }
+    }
+    
     private func uploadProfileImage(imageData: Data, imageSize: ImageSize) {
-        guard let uid = myUserInfo?.id else {
+        guard let myUserInfo else {
             print("uid가 존재하지 않아 이미지 저장에 실패하였습니다")
             return
         }
-        let storageRef = Storage.storage().reference().child("UserProfileImages/\(uid)/\(imageSize.rawValue)")
-        storageRef.putData(imageData) { _, error in
+        let defaultImageRef = Storage.storage().reference().child("UserProfileImages/\(myUserInfo.id)")
+        let detailProfileImageRef = defaultImageRef.child(imageSize.rawValue)
+        detailProfileImageRef.putData(imageData) { _, error in
             if let error {
                 print(error.localizedDescription)
+                return
             }
+            self.update(profileImagePath: defaultImageRef.fullPath)
         }
     }
     
@@ -217,6 +220,25 @@ final class MyProfile {
     
     func isJoin(in club: Club) -> Bool {
         return club.userList?.contains(where: { $0.id == myUserInfo?.id }) ?? false
+    }
+    
+    func addObserve() {
+        ref.observe(.value) { dataSnapShot, _  in
+            guard let value = dataSnapShot.value,
+                  dataSnapShot.exists() else {
+                print("User 정보를 가져오지 못했습니다.")
+                return
+            }
+            guard let idoUser: IDoUser = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                print("나의 User정보를 IdoUser 형태로 디코딩하지 못했습니다.")
+                return
+            }
+            self.myUserInfo = idoUser.toMyUserInfo
+            if let profilePath = idoUser.profileImagePath {
+                self.loadImage(defaultPath: profilePath, paths: ImageSize.allCases)
+                return
+            }
+        }
     }
     
     deinit {

@@ -29,6 +29,36 @@ class MyProfileUpdateManager: FBDatabaseManager<IDoUser> {
         }
     }
     
+    func updateBlockUser(blockUser: UserSummary, myProfile: MyUserInfo, completion: ((Bool) -> Void)? = nil) {
+        var idoUser = myProfile.toIDoUser
+        var blockList = idoUser.blockList ?? []
+        blockList.append(blockUser)
+        idoUser.blockList = blockList
+        
+        updateValue(value: idoUser) { isSuccess in
+            if isSuccess {
+                completion?(true)
+                return
+            }
+            completion?(false)
+        }
+    }
+    
+    func removeBlockUser(blockUser: UserSummary, myProfile: MyUserInfo, completion: ((Bool) -> Void)? = nil) {
+        var idoUser = myProfile.toIDoUser
+        var blockList = idoUser.blockList ?? []
+        blockList.removeAll(where: { $0.id == blockUser.id })
+        idoUser.blockList = blockList
+        
+        updateValue(value: idoUser) { isSuccess in
+            if isSuccess {
+                completion?(true)
+                return
+            }
+            completion?(false)
+        }
+    }
+    
     private func updateClub(idoUser: IDoUser, club: Club, completion: ((Bool) -> Void)? = nil) {
         let clubUserRef = defaultRef.child(club.category).child("meetings").child(club.id).child("userList")
         
@@ -169,7 +199,7 @@ class MyProfileUpdateManager: FBDatabaseManager<IDoUser> {
                             return
                         }
                         guard let club: Club = DataModelCodable.decodingSingleDataSnapshot(value: dataSnapShot) else { return }
-                        self.clubFirebaseManager.removeClub(club: club, userList: club.userList ?? []) { success in
+                        self.clubFirebaseManager.removeClub(club: club) { success in
                             if success {
                                 print("탈퇴 회원 관련 게시글,댓글 삭제 성공")
                             }

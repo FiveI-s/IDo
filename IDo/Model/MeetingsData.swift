@@ -76,7 +76,14 @@ class MeetingsData {
                 completion?(false)
                 return
             }
-            let tempClubs: [Club] = DataModelCodable.decodingDataSnapshot(value: value)
+            var tempClubs: [Club] = DataModelCodable.decodingDataSnapshot(value: value)
+            let myBlockList = MyProfile.shared.myUserInfo?.blockList ?? []
+            myBlockList.forEach { blockUser in
+                tempClubs = tempClubs.filter { $0.rootUser.id != blockUser.id }
+                for index in 0..<tempClubs.count {
+                    tempClubs[index].userList?.removeAll(where: {$0.id == blockUser.id})
+                }
+            }
             self.clubs = tempClubs.sorted(by: { $0.createDate > $1.createDate })
             completion?(true)
             self.update()

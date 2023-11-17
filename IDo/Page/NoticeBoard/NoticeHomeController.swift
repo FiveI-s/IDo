@@ -179,9 +179,7 @@ final class NoticeHomeController: UIViewController {
                 return
             }
             self.signUpButtonUpdate?(authState)
-            self.memberTableView.beginUpdates()
-            self.memberTableView.insertRows(at: [IndexPath(row: count - 1, section: 0)], with: .automatic)
-            self.memberTableView.endUpdates()
+            self.memberTableView.reloadData()
             self.addMyClubList()
         }
     }

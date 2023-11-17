@@ -43,18 +43,14 @@ class FirebaseCommentManaer: FBDatabaseManager<Comment> {
                 completion(.success(self.modelList))
                 return
             }
-            let dataList: [Comment] = DataModelCodable.decodingDataSnapshot(value: value).sorted(by: { $0.createDate >= $1.createDate })
+            var dataList: [Comment] = DataModelCodable.decodingDataSnapshot(value: value).sorted(by: { $0.createDate >= $1.createDate })
+            let myBlockList = MyProfile.shared.myUserInfo?.blockList ?? []
+            myBlockList.forEach { blockUser in
+                dataList.removeAll(where: {$0.writeUser.id == blockUser.id})
+            }
             self.viewState = .loaded
             self.modelList = dataList
             completion(.success(dataList))
-        }
-    }
-    
-    func updateNoticeBoard(completion: ((Bool) -> Void)? = nil) {
-        noticeBoardRef.updateChildValues(["commentCount": "\(modelList.count)"]) { error, _ in
-            if let error {
-                print(error.localizedDescription)
-            }
         }
     }
     
@@ -64,14 +60,13 @@ class FirebaseCommentManaer: FBDatabaseManager<Comment> {
                 print(error.localizedDescription)
                 return
             }
-            self.modelList.removeAll()
             if let myUserInfo = MyProfile.shared.myUserInfo {
                 let deleteMyCommentList = self.modelList.filter{ $0.writeUser.id == myUserInfo.id }
                 var myCommentList = MyProfile.shared.myUserInfo?.myCommentList
                 for deleteComment in deleteMyCommentList {
                     myCommentList?.removeAll(where: { $0.id == deleteComment.id })
-                    MyProfile.shared.update(myCommentList: myCommentList)
                 }
+                MyProfile.shared.update(myCommentList: myCommentList)
             }
         }
     }

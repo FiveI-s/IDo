@@ -27,6 +27,8 @@ class FirebaseManager {
     var club: Club
     var missSelectedImage: [UIImage] = []
     
+    var isClubExists: Bool = true
+    
     
     // 원본
     var selectedImage: [String: StorageImage] = [:]
@@ -124,8 +126,12 @@ class FirebaseManager {
                 return
             }
             
-            let newNoticeBoards: [NoticeBoard] = DataModelCodable.decodingDataSnapshot(value: value)
+            var newNoticeBoards: [NoticeBoard] = DataModelCodable.decodingDataSnapshot(value: value)
             
+            var myBlockList = MyProfile.shared.myUserInfo?.blockList ?? []
+            myBlockList.forEach { blockUser in
+                newNoticeBoards.removeAll(where: { $0.rootUser.id == blockUser.id })
+            }
             self.noticeBoards = newNoticeBoards.sorted(by: { $0.createDate > $1.createDate })
             
             self.delegate?.reloadData()
@@ -173,6 +179,11 @@ class FirebaseManager {
         }
     }
     
+    func updateNoticeBoardCommentCount(noticeBoard: NoticeBoard) {
+        let ref = Database.database().reference().child("noticeBoards").child(noticeBoard.clubID).child(noticeBoard.id).child("commentCount")
+        ref.setValue(noticeBoard.commentCount)
+    }
+    
     // MARK: - 데이터 삭제
 
     func deleteNoticeBoard(at index: Int, completion: ((Bool) -> Void)? = nil) {
@@ -189,7 +200,13 @@ class FirebaseManager {
                 else {
                     print("Successfully deleted notice board.")
                     self.deleteNoticeBoardToClub(noticeBoard: self.noticeBoards[index])
-                    self.removeMyNoticeBoard(noticeBoard: self.noticeBoards[index])
+                    let noticeBoard = self.noticeBoards[index]
+                    if let myUserInfo = MyProfile.shared.myUserInfo,
+                       myUserInfo.id == noticeBoard.rootUser.id {
+                        self.removeMyNoticeBoard(noticeBoard: self.noticeBoards[index])
+                    } else {
+                        self.removeNoticeBoard(removeNoticeBoard: self.noticeBoards[index])
+                    }
                     self.deleteImage(noticeBoardID: self.noticeBoards[index].id, imagePaths: imagePaths) { success in
                         if success {
                             completion?(true)
@@ -207,7 +224,7 @@ class FirebaseManager {
     
     private func deleteNoticeBoardToClub(noticeBoard: NoticeBoard) {
         let clubRef = Database.database().reference().child(club.category).child("meetings").child(club.id).child("noticeBoardList")
-        guard let noticeBoardIndex = club.noticeBoardList?.contains(where: { $0.id == noticeBoard.id }) else { return }
+        guard let noticeBoardIndex = club.noticeBoardList?.firstIndex(where: { $0.id == noticeBoard.id }) else { return }
         let indexRef = clubRef.child("\(noticeBoardIndex)")
         clubRef.updateChildValues(["\(noticeBoardIndex)": nil]) { error, _ in
             if let error {
@@ -374,6 +391,30 @@ class FirebaseManager {
         MyProfile.shared.update(myNoticeBoardList: noticeBoardList)
     }
     
+    // MARK: 다른 사용자의 게시판 제거(신고로 인한 삭제시)
+    func removeNoticeBoard(removeNoticeBoard: NoticeBoard, completion: (() -> Void)? = nil) {
+        let ref = Database.database().reference().child("Users").child(removeNoticeBoard.rootUser.id).child("myNoticeBoardList")
+        ref.getData { error, dataSnapShot in
+            if let error {
+                print(error.localizedDescription)
+                return
+            }
+            guard dataSnapShot?.exists() != nil,
+                  let values = dataSnapShot?.value as? [Any] else {
+                print("사용자의 게시판 리스트가 존재하지 않습니다.")
+                return
+            }
+            var noticeBoardList = [NoticeBoard]()
+            values.forEach { value in
+                if let noticeBoard: NoticeBoard = DataModelCodable.decodingSingleDataSnapshot(value: value) {
+                    if noticeBoard.id == removeNoticeBoard.id { return }
+                    noticeBoardList.append(noticeBoard)
+                }
+            }
+            ref.setValue(noticeBoardList.asArrayDictionary())
+        }
+    }
+    
     // MARK: - 신고 횟수 저장(noticeBoard에서 진행)
     func updateUserDeclarationCount(userID: String, declarationCount: Int, completion: ((Bool) -> Void)? = nil) {
         let ref = Database.database().reference().child(club.category).child("meetings").child(club.id).child("userList")
@@ -404,5 +445,40 @@ class FirebaseManager {
                 completion?(true)
             }
         })
+    }
+    
+    //MARK: observe 클럽
+    func observeClubUserList() {
+        let club = self.club
+        let clubRef = Database.database().reference().child(club.category).child("meetings").child(club.id).child("userList")
+        clubRef.observe(.value) { dataSnapShot in
+            print("update club")
+            if dataSnapShot.exists() {
+                guard dataSnapShot.exists(),
+                      let values = dataSnapShot.value as? [Any] else {
+                    print("club에 value가 존재하지 않습니다.")
+                    return
+                }
+                self.isClubExists = true
+                
+                var userList: [UserSummary] = []
+                values.forEach { value in
+                    guard let user: UserSummary = DataModelCodable.decodingSingleDataSnapshot(value: value) else {
+                        print("업데이트된 모임 맴버를 디코딩하지 못했습니다.")
+                        return
+                    }
+                    userList.append(user)
+                }
+                self.club.userList = userList
+            } else {
+                self.isClubExists = false
+            }
+        }
+    }
+    
+    func removeObserveClubUserList() {
+        let club = self.club
+        let ref = Database.database().reference().child(club.category).child("meetings").child(club.id)
+        ref.removeAllObservers()
     }
 }

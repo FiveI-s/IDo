@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1024EC0F2B038D39002095B5 /* PresentToProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1024EC0E2B038D39002095B5 /* PresentToProfileVC.swift */; };
 		102C6E2A2AFAB0FE008BBB37 /* NoticeBoardImagePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102C6E292AFAB0FE008BBB37 /* NoticeBoardImagePath.swift */; };
 		10790B972AF7B35F001F6CCB /* NavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10790B962AF7B35F001F6CCB /* NavigationBar.swift */; };
 		10B174882ADAE11C00BF4273 /* SpoqaHanSansNeo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 10B174832ADAE11A00BF4273 /* SpoqaHanSansNeo-Bold.ttf */; };
@@ -26,6 +27,7 @@
 		18A860AD2AFB7430002DC32B /* MyProfileUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A860AC2AFB7430002DC32B /* MyProfileUpdateManager.swift */; };
 		18B591A02AF1D658002A684D /* DataModelCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B5919F2AF1D658002A684D /* DataModelCodable.swift */; };
 		18B591A22AF275CF002A684D /* MemberTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B591A12AF275CE002A684D /* MemberTableViewCell.swift */; };
+		18C042282B06F9D200B35F46 /* BlockListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C042272B06F9D200B35F46 /* BlockListViewController.swift */; };
 		18C26A002AD941AF00899A6F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 18C269FF2AD941AF00899A6F /* FirebaseAnalytics */; };
 		18C26A022AD941AF00899A6F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 18C26A012AD941AF00899A6F /* FirebaseAuth */; };
 		18C26A042AD941AF00899A6F /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 18C26A032AD941AF00899A6F /* FirebaseDatabase */; };
@@ -118,6 +120,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1024EC0E2B038D39002095B5 /* PresentToProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentToProfileVC.swift; sourceTree = "<group>"; };
 		102C6E292AFAB0FE008BBB37 /* NoticeBoardImagePath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBoardImagePath.swift; sourceTree = "<group>"; };
 		10790B962AF7B35F001F6CCB /* NavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBar.swift; sourceTree = "<group>"; };
 		10842A202AE0FCB700684FDE /* NoticeBoardCRUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeBoardCRUD.swift; sourceTree = "<group>"; };
@@ -164,7 +167,9 @@
 		18B5919F2AF1D658002A684D /* DataModelCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModelCodable.swift; sourceTree = "<group>"; };
 		18B591A12AF275CE002A684D /* MemberTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberTableViewCell.swift; sourceTree = "<group>"; };
 		18B819802AEB5E9800E284AC /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		18B924F62B05414E00AE506D /* IDo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IDo.entitlements; sourceTree = "<group>"; };
 		18BD1A902AE0C92B004BC2B1 /* FirebaseCommentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseCommentManager.swift; sourceTree = "<group>"; };
+		18C042272B06F9D200B35F46 /* BlockListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListViewController.swift; sourceTree = "<group>"; };
 		18C055212ADE6EF9003D26E4 /* CommentUpdateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentUpdateViewController.swift; sourceTree = "<group>"; };
 		18C055242ADE8AA3003D26E4 /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		18C65F312AEA0656006A3A79 /* FirebaseCreateUserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseCreateUserManager.swift; sourceTree = "<group>"; };
@@ -283,6 +288,7 @@
 		10C265B02AD55BBF002BA40A /* IDo */ = {
 			isa = PBXGroup;
 			children = (
+				18B924F62B05414E00AE506D /* IDo.entitlements */,
 				18C055232ADE8A9A003D26E4 /* Enum */,
 				18CCC17D2ADD039B000D092C /* Extenstion */,
 				18CE9C232AD8EC1400C921D5 /* Model */,
@@ -333,6 +339,7 @@
 			children = (
 				10CBA03D2AD6466400F1DA37 /* MyProfileViewController.swift */,
 				7B6D8C622ADFD6CA00FF2194 /* MyProfileViewCell.swift */,
+				18C042272B06F9D200B35F46 /* BlockListViewController.swift */,
 			);
 			path = MyProfilePage;
 			sourceTree = "<group>";
@@ -405,6 +412,7 @@
 				18C65F352AEA5AA7006A3A79 /* MyProfile.swift */,
 				18C65F372AEA84D5006A3A79 /* ProfileImageCache.swift */,
 				18B5919F2AF1D658002A684D /* DataModelCodable.swift */,
+				1024EC0E2B038D39002095B5 /* PresentToProfileVC.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -718,6 +726,7 @@
 				7B226EF22AEBD85900EAED75 /* NoticeMeetingController.swift in Sources */,
 				7B226EF32AEBD85900EAED75 /* NoticeHomeController.swift in Sources */,
 				18D764AA2AF3C30C00AD6140 /* IntrinsicTableView.swift in Sources */,
+				1024EC0F2B038D39002095B5 /* PresentToProfileVC.swift in Sources */,
 				7B226EF42AEBD85900EAED75 /* NoticeBoardViewController.swift in Sources */,
 				7B226EF52AEBD85900EAED75 /* NoticeBoardView.swift in Sources */,
 				18A860AD2AFB7430002DC32B /* MyProfileUpdateManager.swift in Sources */,
@@ -738,6 +747,7 @@
 				7B226F042AEBD85900EAED75 /* WriterStackView.swift in Sources */,
 				7B226F052AEBD85900EAED75 /* NoticeBoardDetailViewController.swift in Sources */,
 				7B226F062AEBD85900EAED75 /* CommentUpdateViewController.swift in Sources */,
+				18C042282B06F9D200B35F46 /* BlockListViewController.swift in Sources */,
 				7B226F072AEBD85900EAED75 /* FirebaseCommentManager.swift in Sources */,
 				7B226F082AEBD85900EAED75 /* NoticeViewController.swift in Sources */,
 				7B226F092AEBD85900EAED75 /* NoticeCell.swift in Sources */,
@@ -896,6 +906,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IDo/IDo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -928,6 +939,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IDo/IDo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

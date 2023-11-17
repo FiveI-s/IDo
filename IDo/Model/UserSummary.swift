@@ -13,4 +13,5 @@ struct UserSummary: Codable, Identifier {
     var nickName: String
     var description: String?
     var declarationCount: Int?
+    var hobbyList: [String]?
 }

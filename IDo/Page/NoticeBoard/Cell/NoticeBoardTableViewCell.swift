@@ -14,6 +14,8 @@ class NoticeBoardTableViewCell: UITableViewCell {
     
     var indexPath: IndexPath?
     
+    var onImageTap: (() -> Void)?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -206,5 +208,14 @@ extension NoticeBoardTableViewCell {
             self.profileImageView.imageView.backgroundColor = color
             self.profileImageView.contentMargin = margin
         }
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        DispatchQueue.main.async {
+            self.profileImageView.imageView.isUserInteractionEnabled = true
+            self.profileImageView.imageView.addGestureRecognizer(tapGesture)
+        }
+    }
+    
+    @objc private func profileImageTapped() {
+        onImageTap?()
     }
 }

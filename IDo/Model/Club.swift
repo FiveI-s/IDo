@@ -16,5 +16,6 @@ struct Club: Codable, Identifier {
     var category: String
     var noticeBoardList: [NoticeBoard]?
     var userList: [UserSummary]?
+    var blackList: [UserSummary]?
     var createDate: String // 만든 날짜로 정렬 ..
 }

@@ -32,15 +32,23 @@ class NoticeBoardViewController: UIViewController {
         noticeBoardView.noticeBoardTableView.delegate = self
         noticeBoardView.noticeBoardTableView.dataSource = self
         
+        firebaseManager.observeClubUserList()
         firebaseManager.readNoticeBoard()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         firebaseManager.delegate = self
-        
-        
+        isClubExists()
+        isMyClub()
+        firebaseManager.readNoticeBoard { [weak self] _ in
+            self?.noticeBoardView.noticeBoardTableView.reloadData()
+        }
+    }
+    
+    deinit {
+        print("NoticeBoardViewController Deinit")
+        firebaseManager.removeObserveClubUserList()
     }
     
     private func selectView() {
@@ -67,6 +75,27 @@ class NoticeBoardViewController: UIViewController {
     }
 }
 
+//MARK: Club 확인 관련
+extension NoticeBoardViewController {
+    private func isMyClub() {
+        guard MyProfile.shared.isJoin(in: firebaseManager.club) else {
+            AlertManager.showIsNotClubMemberChek(on: self)
+            return
+        }
+        return
+    }
+    
+    private func isClubExists() {
+        if firebaseManager.isClubExists == false {
+            AlertManager.showAlert(on: self, title: "클럽이 존재하지 않습니다", message: nil) { _ in
+                self.navigationController?.popViewController(animated: true)
+            }
+            return
+        }
+        return 
+    }
+}
+
 // MARK: - 테이블 뷰 관련
 extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource {
     
@@ -85,10 +114,6 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
             cell.indexPath = indexPath
             firebaseManager.getUserImage(referencePath: profileImageURL, imageSize: .medium) { downloadedImage in
                 if let image = downloadedImage {
-//                    DispatchQueue.main.async {
-//                        //cell.profileImageView.imageView.image = image
-//                        cell.setUserImage(profileImage: image, color: UIColor(color: .contentBackground))
-//                    }
                     cell.setUserImage(profileImage: image, color: UIColor(color: .white), margin: 0)
                 }
             }
@@ -101,6 +126,10 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
         cell.nameLabel.text = firebaseManager.noticeBoards[indexPath.row].rootUser.nickName
         cell.commentLabel.text = firebaseManager.noticeBoards[indexPath.row].commentCount
         cell.selectionStyle = .none
+        
+        cell.onImageTap = { [weak self] in
+            self?.navigateToProfilePage(for: indexPath)
+        }
         return cell
     }
     
@@ -139,6 +168,10 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
             // 게시글 작성자와 현재 사용자가 다를 때
             return UISwipeActionsConfiguration(actions: [])
         }
+    }
+    func navigateToProfilePage(for indexPath: IndexPath) {
+        let profile = firebaseManager.noticeBoards[indexPath.row].rootUser
+        PresentToProfileVC.presentToProfileVC(from: self, with: profile)
     }
 }
 

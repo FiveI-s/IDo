@@ -12,6 +12,7 @@ import UIKit
 class MyProfileViewController: UIViewController {
     private var firebaseManager: FBDatabaseManager<IDoUser>!
     private let scrollView: UIScrollView = UIScrollView()
+    var userProfile: UserSummary?
     
     // 프로필
     var profileImage = UIButton()
@@ -187,29 +188,36 @@ class MyProfileViewController: UIViewController {
         removeKeyboardNotifications()
     }
     
+    // MARK: - 사용자 정보 불러오기
     private func getProfile() {
-        guard let myProfile = MyProfile.shared.myUserInfo else { return }
-        profileName.text = myProfile.nickName
-        if let hobby = myProfile.hobbyList?.first {
-            choiceEnjoyTextField.text = hobby
+        if let profile = userProfile {
+            profileName.text = profile.nickName
+            selfInfoDetail.text = profile.description
         }
-        if let description = myProfile.description {
-            selfInfoDetail.text = description
-        }
-        if let profileMediumImageData = myProfile.profileImage[ImageSize.medium.rawValue],
-           let profileMediumImage = UIImage(data: profileMediumImageData) {
-            profileImage.setImage(profileMediumImage, for: .normal)
-            return
-        }
-        guard let imagePath = myProfile.profileImagePath else {
-              self.profileImage.setImage(UIImage(named: "profile"), for: .normal)
-            return
-        }
-        MyProfile.shared.loadImage(defaultPath: imagePath, paths: [.medium]) {
-            if let imageData = MyProfile.shared.myUserInfo?.profileImage[ImageSize.medium.rawValue],
-               let image = UIImage(data: imageData) {
-                DispatchQueue.main.async {
-                    self.profileImage.setImage(image, for: .normal)
+        else {
+            guard let myProfile = MyProfile.shared.myUserInfo else { return }
+            profileName.text = myProfile.nickName
+            if let hobby = myProfile.hobbyList?.first {
+                choiceEnjoyTextField.text = hobby
+            }
+            if let description = myProfile.description {
+                selfInfoDetail.text = description
+            }
+            if let profileMediumImageData = myProfile.profileImage[ImageSize.medium.rawValue],
+               let profileMediumImage = UIImage(data: profileMediumImageData) {
+                profileImage.setImage(profileMediumImage, for: .normal)
+                return
+            }
+            guard let imagePath = myProfile.profileImagePath else {
+                self.profileImage.setImage(UIImage(named: "profile"), for: .normal)
+                return
+            }
+            MyProfile.shared.loadImage(defaultPath: imagePath, paths: [.medium]) {
+                if let imageData = MyProfile.shared.myUserInfo?.profileImage[ImageSize.medium.rawValue],
+                   let image = UIImage(data: imageData) {
+                    DispatchQueue.main.async {
+                        self.profileImage.setImage(image, for: .normal)
+                    }
                 }
             }
         }
@@ -252,6 +260,7 @@ class MyProfileViewController: UIViewController {
     }
         
     func setLayout() {
+        view.backgroundColor = UIColor(color: .backgroundPrimary)
         view.addSubview(scrollView)
         scrollView.addSubview(profileImage)
         scrollView.addSubview(profileName)
@@ -425,8 +434,10 @@ private extension MyProfileViewController {
         
     func navigationBarButtonAction() {
         // 네비게이션 오른쪽 버튼 생성
-        let editButton = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: self, action: #selector(editVC))
-        navigationItem.rightBarButtonItem = editButton
+        let editButton = UIBarButtonItem(title: "수정", style: .plain, target: self, action: #selector(editVC))
+        let blockListButton = UIBarButtonItem(title: "차단 목록", style: .plain, target: self, action: #selector(moveBlockList))
+        blockListButton.tintColor = UIColor(color: .negative)
+        navigationItem.rightBarButtonItems = [editButton, blockListButton]
         navigationItem.rightBarButtonItem?.tintColor = UIColor(color: .main)
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "취소", style: .done, target: self, action: #selector(profileUpdateCancle))
@@ -466,7 +477,7 @@ private extension MyProfileViewController {
         
         hiddenLeftButton()
         
-        navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
+        navigationItem.rightBarButtonItems?.first?.title = "수정"
         
         profileName.isUserInteractionEnabled = false
         profileName.backgroundColor = .clear
@@ -499,6 +510,11 @@ private extension MyProfileViewController {
         }
         
         choiceEnjoyTextField.tintColor = .clear
+    }
+    
+    @objc func moveBlockList() {
+        let vc = BlockListViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     // 수정 버튼을 눌렀을 때
@@ -536,7 +552,7 @@ private extension MyProfileViewController {
                 isEdit = true
             }
             else {
-                navigationItem.rightBarButtonItem?.image = UIImage(systemName: "square.and.pencil")
+                navigationItem.rightBarButtonItems?.first?.title = "수정"
                 hiddenLeftButton()
                 
                 profileName.isUserInteractionEnabled = false

@@ -9,9 +9,9 @@ import UIKit
 
 class AlertManager {
     // 정적 메서드로 구현 -> 인스턴스화 시키지 않아도 사용 가능
-    static func showAlert(on viewController: UIViewController, title: String, message: String) {
+    static func showAlert(on viewController: UIViewController, title: String?, message: String?, action: ((UIAlertAction) -> ())? = nil) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+        let okAction = UIAlertAction(title: "확인", style: .default, handler: action)
         alertController.addAction(okAction)
         viewController.present(alertController, animated: true, completion: nil)
     }
@@ -27,13 +27,15 @@ class AlertManager {
         viewController.present(alertController, animated: true, completion: nil)
     }
     
-    static func showDeclaration(on viewController: UIViewController, title: String? = nil, message: String? = nil, declarationHandler: ((UIAlertAction) -> Void)? = nil, cancelHandelr: ((UIAlertAction) -> Void)? = nil) {
+    static func showDeclaration(on viewController: UIViewController, title: String? = nil, message: String? = nil, declarationHandler: ((UIAlertAction) -> Void)? = nil, blockHandler: ((UIAlertAction) -> Void)? = nil, cancelHandelr: ((UIAlertAction) -> Void)? = nil) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         let declarationAction = UIAlertAction(title: "신고하기", style: .destructive, handler: declarationHandler)
+        let blockAction = UIAlertAction(title: "차단하기", style: .destructive, handler: blockHandler)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: cancelHandelr)
         
         alertController.addAction(declarationAction)
+        alertController.addAction(blockAction)
         alertController.addAction(cancelAction)
         viewController.present(alertController, animated: true, completion: nil)
     }
@@ -73,12 +75,29 @@ class AlertManager {
         viewController.present(actionSheetController, animated: true, completion: nil)
     }
     
-    static func showCheckDeclaration(on viewController: UIViewController, title: String, message: String, okHandler: ((UIAlertAction) -> Void)? = nil) {
+    static func showCheckDeclaration(on viewController: UIViewController, title: String?, message: String, okHandler: ((UIAlertAction) -> Void)? = nil) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "확인", style: .destructive, handler: okHandler)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
+        viewController.present(alertController, animated: true, completion: nil)
+    }
+    
+    static func showIsNotClubMemberChek(on viewController: UIViewController) {
+        
+        let alertController = UIAlertController(title: "모임 회원이 아닙니다", message: nil, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "확인", style: .destructive) { _ in
+            if let navigationController = viewController.navigationController {
+                for controller in navigationController.viewControllers {
+                    if let meetingVC = controller as? MeetingViewController {
+                        navigationController.popToViewController(meetingVC, animated: true)
+                        break
+                    }
+                }
+            }
+        }
+        alertController.addAction(okAction)
         viewController.present(alertController, animated: true, completion: nil)
     }
 }

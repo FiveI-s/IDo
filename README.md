@@ -132,12 +132,12 @@ iDo는 카테고리를 통해 좀 더 쉽게 같은 취미를 가진 사람들�
 
 ## 🔫 트러블 슈팅
 
-- [페이지 별 데이터 동기화]()
+- [페이지 별 데이터 동기화](https://boundless-periwinkle-f12.notion.site/762b7a714ee34fc1a82876d0ec7ead4e?pvs=4)
 
-- [UI 업데이트]()
+- [UI 업데이트](https://boundless-periwinkle-f12.notion.site/UI-72b2cb78789a44feb79eb344af85223f?pvs=4)
 
-- [이미지 비율 및 다운로드 속도]()
+- [이미지 비율 및 다운로드 속도](https://boundless-periwinkle-f12.notion.site/0a66bb604b6c467c86b52d78ed5e36e6?pvs=4)
 
-- [기기 별 레이아웃 조정]()
+- [기기 별 레이아웃 조정](https://boundless-periwinkle-f12.notion.site/a411a7136c9240d9879d15b7d339eaa0?pvs=4)
 
 <br>

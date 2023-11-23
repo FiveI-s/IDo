@@ -14,8 +14,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
-        // Firebase 초기화
-        FirebaseApp.configure()
+        var firebasePlistName = "GoogleService-Info" // 기본 설정 파일 이름
+        #if DEBUG
+        firebasePlistName += "-Debug" // 개발용 Configuration
+        print("[FIREBASE] Development mode.")
+        #else
+        firebasePlistName += "-Release" // 배포용 Configuration
+        print("[FIREBASE] Production mode.")
+        #endif
+        
+        if let filePath = Bundle.main.path(forResource: firebasePlistName, ofType: "plist"),
+            let options = FirebaseOptions(contentsOfFile: filePath) {
+            FirebaseApp.configure(options: options)
+        }
 
         // 카카오 초기화
 //        KakaoSDK.initSDK(appKey: apiKey)

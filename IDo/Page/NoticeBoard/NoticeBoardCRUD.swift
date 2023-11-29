@@ -84,7 +84,9 @@ class FirebaseManager {
                     if success {
                         self.addMyNoticeBoard(noticeBoard: newNoticeBoard)
                         self.noticeBoards.insert(newNoticeBoard, at: 0)
-                        self.delegate?.reloadData()
+                        DispatchQueue.main.async {
+                            self.delegate?.reloadData()
+                        }
                     }
                     completion(success)
                 }
@@ -109,20 +111,22 @@ class FirebaseManager {
     }
 
     // MARK: - 데이터 읽기
-    func readNoticeBoard(completion: ((Bool) -> Void)? = nil) {
+    func readNoticeBoard(completion: @escaping (Bool) -> Void) {
         
         let ref = Database.database().reference().child("noticeBoards").child(club.id)
         
         ref.getData(completion: { (error, snapshot) in
             if let error = error {
                 print("Error getting data: \(error)")
-                completion?(false)
+                completion(false)
                 return
             }
             
             guard let value = snapshot?.value as? [String: Any] else {
-                self.delegate?.reloadData()
-                completion?(false)
+                DispatchQueue.main.async {
+                    self.delegate?.reloadData()
+                }
+                completion(false)
                 return
             }
             
@@ -133,9 +137,10 @@ class FirebaseManager {
                 newNoticeBoards.removeAll(where: { $0.rootUser.id == blockUser.id })
             }
             self.noticeBoards = newNoticeBoards.sorted(by: { $0.createDate > $1.createDate })
-            
-            self.delegate?.reloadData()
-            completion?(true)
+            DispatchQueue.main.async {
+                self.delegate?.reloadData()
+            }
+            completion(true)
         })
     }
 
@@ -166,7 +171,9 @@ class FirebaseManager {
                                 if success {
                                     self.updateMyNoticeBoard(noticeBoard: updatedNoticeBoard)
                                     self.noticeBoards[index] = updatedNoticeBoard
-                                    self.delegate?.reloadData()
+                                    DispatchQueue.main.async {
+                                        self.delegate?.reloadData()
+                                    }
                                 }
                                 completion(success)
                             }
@@ -186,7 +193,7 @@ class FirebaseManager {
     
     // MARK: - 데이터 삭제
 
-    func deleteNoticeBoard(at index: Int, completion: ((Bool) -> Void)? = nil) {
+    func deleteNoticeBoard(at index: Int, completion: @escaping (Bool) -> Void) {
         if index >= 0, index < self.noticeBoards.count {
             let noticeBoardID = self.noticeBoards[index].id
             let imagePaths = self.noticeBoards[index].imageList?.map { $0.savedImagePath } ?? []
@@ -195,7 +202,7 @@ class FirebaseManager {
             ref.removeValue { error, _ in
                 if let error = error {
                     print("Error deleting notice board: \(error)")
-                    completion?(false)
+                    completion(false)
                 }
                 else {
                     print("Successfully deleted notice board.")
@@ -209,16 +216,18 @@ class FirebaseManager {
                     }
                     self.deleteImage(noticeBoardID: self.noticeBoards[index].id, imagePaths: imagePaths) { success in
                         if success {
-                            completion?(true)
+                            completion(true)
                         }
                     }
                     self.noticeBoards.remove(at: index)
-                    self.delegate?.reloadData()
+                    DispatchQueue.main.async {
+                        self.delegate?.reloadData()
+                    }
                 }
             }
         }
         else {
-            completion?(false)
+            completion(false)
         }
     }
     

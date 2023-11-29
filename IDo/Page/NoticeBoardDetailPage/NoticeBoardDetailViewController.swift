@@ -210,7 +210,11 @@ private extension NoticeBoardDetailViewController {
                     self.firebaseNoticeBoardManager.deleteNoticeBoard(at: self.editIndex) { success in
                         if success {
                             self.firebaseCommentManager.deleteAllCommentList()
-                            self.firebaseNoticeBoardManager.readNoticeBoard()
+                            self.firebaseNoticeBoardManager.readNoticeBoard() { success in
+                                if success {
+                                    print("Firebase 정보 불러오기 성공")
+                                }
+                            }
                             self.navigationController?.popViewController(animated: true)
                         }
                     }
@@ -296,7 +300,11 @@ private extension NoticeBoardDetailViewController {
                     self.firebaseNoticeBoardManager.updateUserDeclarationCount(userID: self.noticeBoard.rootUser.id, declarationCount: declarationCount)
                     
                     
-                    self.firebaseNoticeBoardManager.readNoticeBoard()
+                    self.firebaseNoticeBoardManager.readNoticeBoard() { success in
+                        if success {
+                            print("Firebase 정보 불러오기 성공")
+                        }
+                    }
                     
                     if (self.firebaseNoticeBoardManager.club.userList?[rootUserIndex].declarationCount) ?? 0 >= 3 {
                         let userList = self.firebaseNoticeBoardManager.club.userList ?? []

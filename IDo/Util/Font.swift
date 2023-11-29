@@ -8,6 +8,10 @@
 import UIKit
 
 extension UIFont {
+    
+    // 사용방법 : UIFont.bodyFont(.large, weight: .medium)
+    //          UIFont.headFont(.large, weight: .medium)
+    
     enum Body: CGFloat {
         case large = 18
         case medium = 16
@@ -31,14 +35,6 @@ extension UIFont {
         case light = "SpoqaHanSansNeo-Light"
         case thin = "SpoqaHanSansNeo-Thin"
     }
-    
-//    static func bodyFont(_ label: Body, weight: Weight) -> UIFont {
-//        return systemFont(ofSize: label.rawValue, weight: weight)
-//    }
-//    
-//    static func headFont(_ head: Heading, weight: Weight) -> UIFont {
-//        return systemFont(ofSize: head.rawValue, weight: weight)
-//    }
     
     static func customFont(_ name: FontName, size: CGFloat) -> UIFont {
         return UIFont(name: name.rawValue, size: size) ?? UIFont.systemFont(ofSize: size)

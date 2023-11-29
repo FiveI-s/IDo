@@ -178,7 +178,7 @@ private extension CreateNoticeBoardViewController {
                 createNoticeBoardView.titleCountLabel.text = "(\(editingTitleText.count)/16)"
                 createNoticeBoardView.titleCountLabel.textColor = .black
                 
-                // 제목 글자 수 반영
+                // 내용 글자 수 반영
                 createNoticeBoardView.contentCountLabel.text = "(\(editingContentText.count)/500)"
                 createNoticeBoardView.contentCountLabel.textColor = .black
             }

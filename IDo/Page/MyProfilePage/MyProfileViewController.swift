@@ -713,7 +713,7 @@ extension MyProfileViewController: UIImagePickerControllerDelegate {
                                         // 재인증 오류 처리
                                         print(error.localizedDescription)
                                     } else {
-                                        // 재인증이 성공적으로 완료되었다면 민감한 작업을 계속합니다.
+                                        // 재인증이 성공적으로 완료되었다면 작업 진행
                                         user.delete { [self] error in
                                             if let error = error {
                                                 print("Firebase Error : ", error)

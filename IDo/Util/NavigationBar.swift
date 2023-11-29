@@ -7,7 +7,7 @@
 
 import UIKit
 
-class NavigationBar {
+final class NavigationBar {
     
     static func setNavigationBackButton(for navigationItem: UINavigationItem, title: String) {
         let backBarButtonItem = UIBarButtonItem(title: title, style: .plain, target: nil, action: nil)

@@ -33,7 +33,11 @@ class NoticeBoardViewController: UIViewController {
         noticeBoardView.noticeBoardTableView.dataSource = self
         
         firebaseManager.observeClubUserList()
-        firebaseManager.readNoticeBoard()
+        firebaseManager.readNoticeBoard() {success in
+            if success {
+                print("Firebase 정보 불러오기 성공")
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -152,7 +156,11 @@ extension NoticeBoardViewController: UITableViewDelegate, UITableViewDataSource 
             let deleteNoticeBoardAction = UIContextualAction(style: .normal, title: nil) { (action, view, completion) in
                 self.firebaseManager.deleteNoticeBoard(at: indexPath.row) { success in
                     if success {
-                        self.firebaseManager.readNoticeBoard()
+                        self.firebaseManager.readNoticeBoard() {success in
+                            if success {
+                                print("Firebase 정보 불러오기 성공")
+                            }
+                        }
                     }
                 }
                 completion(true)

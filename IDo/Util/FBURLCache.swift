@@ -31,7 +31,7 @@ class FBURLCache {
     }
     
     //TODO: 코드를 메서드를 어떻게 줄일지 생각해보기
-    func downloadURL(storagePath: String, completion: @escaping (Result<UIImage,Error>) -> Void) {
+    func downloadURL(storagePath: String, indexPath: IndexPath? = nil, completion: @escaping (Result<UIImage,Error>) -> Void) {
         var cacheImage: CacheImage? = nil
         if let image = imageCache.object(forKey: storagePath as NSString) {
             completion(.success(image.image))
@@ -58,17 +58,17 @@ class FBURLCache {
                 }
                 guard let url else { return }
                 let request = URLRequest(url: url)
-                self.downloadImageData(request: request, storagePath: storagePath, updated: metadata?.updated) { result in
+                self.downloadImageData(request: request, storagePath: storagePath, indexPath: indexPath, updated: metadata?.updated) { result in
                     switch result {
                     case .success(let data):
                         if let image = UIImage(data: data) {
                             completion(.success(image))
-                            return
                         }
-                        print("image Data를 읽을수 없습니다.")
                     case .failure(let error):
                         completion(.failure(error))
-                        return
+                    }
+                    if let indexPath {
+                        self.downloadTasks.removeValue(forKey: indexPath)
                     }
                 }
             }
@@ -80,7 +80,7 @@ class FBURLCache {
         var image: UIImage
     }
     
-    func downloadURL(storagePath: String, indexPath: IndexPath? = nil,completion: @escaping (Result<ImageIndex,Error>) -> Void) {
+    func downloadURL(storagePath: String, indexPath: IndexPath? = nil, completion: @escaping (Result<ImageIndex,Error>) -> Void) {
         
 //        if let image = imageCache.object(forKey: storagePath as NSString) {
 //            completion(.success(image))
@@ -125,12 +125,6 @@ class FBURLCache {
     
     private func downloadImageData(request: URLRequest, storagePath: String, indexPath: IndexPath? = nil, updated: Date? = nil, completion: @escaping (Result<Data,Error>) -> Void) {
         let urlTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            
-            defer {
-                if let indexPath {
-                    self?.downloadTasks.removeValue(forKey: indexPath)
-                }
-            }
             
             if let error {
                 completion(.failure(error))

@@ -87,7 +87,7 @@ class BasicCell: UITableViewCell {
         if let indexPath {
             FBURLCache.shared.cancelDownloadURL(indexPath: indexPath)
         }
-        basicImageView.image = nil
+        self.basicImageView.image = nil
     }
 }
 

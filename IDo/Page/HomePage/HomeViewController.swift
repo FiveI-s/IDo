@@ -86,7 +86,6 @@ class HomeViewController : UIViewController {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         MyProfile.shared.getUserProfile(uid: uid) { _ in
             self.updateUIBasedOnData()
-            self.joinClubTableView.reloadData()
         }
         self.navigationController?.setNavigationBackButton(title: "")
     }
@@ -153,10 +152,10 @@ class HomeViewController : UIViewController {
         }
     }
     
-    func getUserClubImage(referencePath: String, imageSize: ImageSize, completion: ((UIImage) -> Void)? = nil) {
+    func getUserClubImage(referencePath: String, imageSize: ImageSize, indexPath: IndexPath, completion: ((UIImage) -> Void)? = nil) {
         // 카테고리 -> meetings_images -> referencePath
         let storageRef = Storage.storage().reference().child(referencePath).child(imageSize.rawValue)
-        FBURLCache.shared.downloadURL(storagePath: storageRef.fullPath) { result in
+        FBURLCache.shared.downloadURL(storagePath: storageRef.fullPath, indexPath: indexPath) { result in
             switch result {
             case .success(let image):
                 completion?(image)
@@ -173,9 +172,9 @@ extension HomeViewController : UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == suggestTableView {
             return 1
+        } else {
+            return MyProfile.shared.myUserInfo?.myClubList?.count ?? 0
         }
-    
-        return MyProfile.shared.myUserInfo?.myClubList?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -193,9 +192,10 @@ extension HomeViewController : UITableViewDelegate, UITableViewDataSource {
             cell.titleLabel.text = currentUserClubList[indexPath.row].title
             cell.aboutLabel.text = currentUserClubList[indexPath.row].description
             cell.memberLabel.text = "멤버 \((currentUserClubList[indexPath.row].userList?.count ?? 0))"
-            
+            cell.indexPath = indexPath
+                        
             guard let imageReferencePath = currentUserClubList[indexPath.row].imageURL else { return cell }
-            getUserClubImage(referencePath: imageReferencePath, imageSize: .small) { image in
+            getUserClubImage(referencePath: imageReferencePath, imageSize: .small, indexPath: indexPath) { image in
                 DispatchQueue.main.async {
                     cell.basicImageView.image = image
                 }
